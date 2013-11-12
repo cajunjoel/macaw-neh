@@ -369,6 +369,73 @@ class Scan extends Controller {
 		} // try-catch
 	}
 
+
+
+	function review_item($item_id = null, $page_ids = null) {
+		$this->common->check_session();
+
+		// Get the barcode based on the id
+		$barcode = $this->book->get_barcode($item_id);
+		
+		if (!$barcode) {
+			$this->session->set_userdata('errormessage', 'That item was not found. (Item ID '.$item_id.')');
+			redirect($this->config->item('base_url').'main/listitems');
+			return;
+		}
+
+		
+		if (!$this->book->exists($barcode)) {
+			// We don't want to be left with a situation that makes the user thinks they
+			// have a valid book when it was invalid. Reset the session variables.
+			$this->session->set_userdata('barcode', '');
+			$this->session->set_userdata('title', '');
+			$this->session->set_userdata('author', '');
+
+			$this->session->set_userdata('errormessage', 'That item was not found. (Item ID '.$item_id.')');
+			redirect($this->config->item('base_url').'main/listitems');
+			return;
+		}
+
+
+		// Query the database for the barcode
+		try {
+			// Get the book
+			$this->book->load($barcode);
+			
+
+
+			// Do we have permission to view this item? 
+			// People with the same org or super admins can access it, everyone else gets denied
+			$this->user->load($this->session->userdata('username'));
+			if ($this->book->org_id != $this->user->org_id && !$this->user->has_permission('admin')) {
+				// Give our response to the user.
+				$this->session->set_userdata('errormessage', 'You do not have permission to use that item.');
+				redirect($this->config->item('base_url').'main/listitems');
+				return;
+			}
+
+ 			// Set the barcode and other info in the session
+			$this->session->set_userdata('barcode', $this->book->barcode);
+			$this->session->set_userdata('title', $this->book->get_metadata('title'));
+			$this->session->set_userdata('author', $this->book->get_metadata('author'));
+
+			// Redirect to the main activities page
+			// Redirect to review, passing in the page ids
+			redirect($this->config->item('base_url').'scan/review/#'.$page_ids);
+		
+		} catch (Exception $e) {
+			// We don't want to be left with a situation that makes the user thinks they
+			// have a valid book when it was invalid. Reset the session variables.
+			$this->session->set_userdata('barcode', '');
+			$this->session->set_userdata('title', '');
+			$this->session->set_userdata('author', '');
+
+			// Redirect to the main activities page
+			$this->session->set_userdata('errormessage', $e->getMessage());
+			redirect($this->config->item('base_url').'main/listitems');
+			return;
+		}
+	}
 	/**
 	 * Show the review page
 	 *
@@ -379,7 +446,7 @@ class Scan extends Controller {
 	 *
 	 * @since Version 1.0
 	 */
-	function review() {
+	function review($all = null) {
 		$this->common->check_session();
 		// Permission Checking
 		if (!$this->user->has_permission('scan')) {
@@ -389,27 +456,90 @@ class Scan extends Controller {
 			return;
 		}
 
-		try {
-			// Get our book
-			$this->book->load($this->session->userdata('barcode'));
-			$this->common->check_missing_metadata($this->book);
-			$this->book->set_status('reviewing');
-			$data = array();
-			$data['base_directory'] = $this->cfg['base_directory'];
+		if ($all && !$this->user->has_permission('admin')) {
+			$this->session->set_userdata('errormessage', 'You do not have permission to access that page.');
+			redirect($this->config->item('base_url').'main/listitems');
+			$this->logging->log('error', 'debug', 'Permission Denied to access '.uri_string());
+			return;
+		}
+		
+		if (!$all) {
+			try {
+				// Get our book
+				$this->book->load($this->session->userdata('barcode'));
+				$this->common->check_missing_metadata($this->book);
+				
+				// Is the book locked?
+				$locked = $this->book->get_metadata('locked-by');
+				// If so, report an error and how long it's been locked.
+				if ($locked && $locked != $this->session->userdata('username')) {
+					$locked_on = $this->book->get_metadata('locked-on');
+					$last_saved = $this->book->get_metadata('last-saved-on');
+					if (!$last_saved) { 
+						$last_saved = date('Y-m-d H:i:s T');
+					}
+					
+					if ((time() - strtotime($last_saved)) > 3600) {
+						$this->session->set_userdata(
+							'errormessage',
+							'This item is in use by '.$locked.' as of '.$locked_on.'. It has been more than an hour since the item was last saved. You may <a href="/scan/break_lock">break the lock</a> to continue editing the item.'
+						);
+						redirect($this->config->item('base_url').'main/listitems');
+						return;
+						
+					} else {
+						$this->session->set_userdata(
+							'errormessage',
+							'This item is in use by '.$locked.' as of '.$locked_on.'. Please wait or ask them to complete the item.'
+						);
+						redirect($this->config->item('base_url').'main/listitems');
+						return;
+					
+					}
+					
+				}
+			} catch (Exception $e) {
+				// Set the error and redirect to the main page
+				$this->session->set_userdata('errormessage', $e->getMessage());
+				$this->logging->log('error', 'debug', 'Error in review() '. $e->getMessage());
+				redirect($this->config->item('base_url').'main');
+			} // try-catch
+				
+			// If not, lock it.
+			$this->book->set_metadata('locked-by', $this->session->userdata('username'));
+			$this->book->set_metadata('locked-on', date('Y-m-d H:i:s T'));
+			$this->book->update();
+			
+			$this->book->set_status('reviewing', $this->user->has_permission('admin'));
+		} 
+		
+		$data = array();
+		$data['base_directory'] = $this->cfg['base_directory'];
+		
+		if (!$all) {
 			$data['metadata_modules'] = $this->cfg['metadata_modules'];
+			$data['ia_identifier'] = $this->book->barcode;
 			$data['item_title'] = $this->session->userdata('title');
-			$this->load->view('scan/review_view', $data);
-			$this->logging->log('access', 'info', 'Scanning review begins for '.$this->book->barcode);
-			$this->logging->log('book', 'info', 'Scanning review begins.', $this->book->barcode);
+		} else {
+			$data['metadata_modules'] = array('NEH_filter');
+			$data['ia_identifier'] = '';
+			$data['item_title'] = 'Viewing all page images';	
+		}
+		$data['all'] = $all;
+		
+		$this->load->view('scan/review_view', $data);
+		$this->logging->log('access', 'info', 'Scanning review begins for '.$this->book->barcode);
+		$this->logging->log('book', 'info', 'Scanning review begins.', $this->book->barcode);
 
-		} catch (Exception $e) {
-			// Set the error and redirect to the main page
-			$this->session->set_userdata('errormessage', $e->getMessage());
-			$this->logging->log('error', 'debug', 'Error in review() '. $e->getMessage());
-			redirect($this->config->item('base_url').'main');
-		} // try-catch
 	}
 
+	function break_lock() {
+		$this->book->load($this->session->userdata('barcode'));
+		$this->book->set_metadata('locked-by', null);
+		$this->book->set_metadata('locked-on', null);
+		$this->book->update();	
+		redirect($this->config->item('base_url').'scan/review');
+	}
 
 	/**
 	 * Get the thumbnails for a book
@@ -426,7 +556,7 @@ class Scan extends Controller {
 
 		$this->common->ajax_headers();
 		try {
-	        $this->book->load($this->session->userdata('barcode'));
+			$this->book->load($this->session->userdata('barcode'));
 		} catch (Exception $e) {
 			echo json_encode(array(
 				'pages' => array(),
@@ -453,6 +583,24 @@ class Scan extends Controller {
 // 			'piece_types' => $this->cfg['piece_types'],
 		));
 	}
+
+
+	/**
+	 * Get the thumbnails for all books
+	 *
+	 * AJAX: Gathers an array of objects for the thumbnails and returns JSON.
+	 * Example: http://site.com/scan/get_all_thumbnails/field,asc/1000/field=val
+	 *
+	 * @since Version 1.0
+	 */
+	function get_all_thumbnails() {	
+		$args = func_get_args();
+		$pages = $this->book->get_all_pages($args);
+		echo json_encode(array(
+			'pages' => $pages
+		));
+	}
+
 
 	/**
 	 * Save metadata and page order
@@ -592,13 +740,16 @@ class Scan extends Controller {
 // 				} // foreach ($this->cfg['page_metadata_fields'] as $m)
 
 				// Update sequence Numbers
-				$this->book->set_page_sequence($page['page_id'], $sequence_count++);
+				// NEH DOESNT NEED THIS
+				// $this->book->set_page_sequence($page['page_id'], $sequence_count++);
 				if (!$data['inserted_missing']) {
 					$this->book->set_missing_flag($page['page_id'], false);
 				}
 			}
 
 		} // foreach ($data->pages as $p)
+		$this->book->set_metadata('last-saved-on', date('Y-m-d H:i:s T'));
+		$this->book->update();
 
 		$this->db->trans_complete();
 
@@ -640,6 +791,14 @@ class Scan extends Controller {
 				// Otherwise, we just treat the book normally and finish it.
 				$this->book->set_status('reviewed');
 			}
+			// Unlock the book
+			$this->book->set_metadata('locked-by', null);
+			$this->book->set_metadata('locked-on', null);
+			$this->book->set_metadata('last-saved-on', null);
+			// Set the last edited to the name of the user
+			$this->book->set_metadata('last-edited-by', $this->session->userdata('username'));
+			$this->book->set_metadata('last-edited-on', date('Y-m-d H:i:s T'));
+
 			$this->book->update();
 			$this->session->set_userdata('message', 'Changes saved! ');
 

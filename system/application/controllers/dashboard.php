@@ -122,22 +122,42 @@ class Dashboard extends Controller {
 		// 	}
 		$data = array();
 
-		$row = $this->book->get_status_counts();
-		$reviewing = $row->scanning + $row->scanned + $row->reviewing; // Things in progress
-
+		$row = $this->book->get_status_counts_neh();
+		
 		$data = array();
 		$data['title'] = 'Summary';
-		$data['html'] = '<div id="summary-widget">'.$row->new.' items ready to be scanned.<br>'.
-		               $reviewing.' items in progress.<br>'.
-		               $row->reviewed.' reviewed and ready to share.<br>'.
-		               $row->exporting.' being exported or verified.<br>'.
-		               $row->completed.' items completed.<br>'.
-		               $row->archived.' items archived.<br>'.
-		               $row->error.' items have errors.<br><br>'.
-		               $row->pages.' pages scanned total.<br>'.
-		               $row->avg.' average scanning time.</div>';
+ 		$data['html'] = '<div id="summary-widget">'.
+ 										'Image Types identified:<br>'.
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_photo.' Photographs<br>'.
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_drawing.' Drawings<br>'.
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_print.' Prints<br>'.
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Diagrams<br>'. 
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_map.' Maps<br>'.
+ 										$row->completed.' items completed<br>'.
+ 										$row->total_items.' total items / '.
+ 										$row->total_pages.' total pages<br>'.
+ 										$row->pages_per_day.' pages completed per day<br>'.
+ 										$row->pct_complete.'% complete overall'.
+ 										'</div>';
 		$data['column'] = '1';
 		return $data;
+		
+		
+// 		$reviewing = $row->scanning + $row->scanned + $row->reviewing; // Things in progress
+// 
+// 		$data = array();
+// 		$data['title'] = 'Summary';
+// 		$data['html'] = '<div id="summary-widget">'.$row->new.' items ready to be scanned.<br>'.
+// 		               $reviewing.' items in progress.<br>'.
+// 		               $row->reviewed.' reviewed and ready to share.<br>'.
+// 		               $row->exporting.' being exported or verified.<br>'.
+// 		               $row->completed.' items completed.<br>'.
+// 		               $row->archived.' items archived.<br>'.
+// 		               $row->error.' items have errors.<br><br>'.
+// 		               $row->pages.' pages scanned total.<br>'.
+// 		               $row->avg.' average scanning time.</div>';
+// 		$data['column'] = '1';
+// 		return $data;
 	}
 
 	/**

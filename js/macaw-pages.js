@@ -17,6 +17,9 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	this.pages = new Array();
 	this.parent = parent;
 	this.data = data;
+	this.idxStartBetween = null;
+	this.idxEndBetween = null;
+	this.currentSort = 'natural';
 
 	// Do we need these?
 	this.availablePageTypes = null;
@@ -71,6 +74,48 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 		}
 	}
 
+
+	this.preSelect = function() {
+		// Get the hash from the URL
+		var hash = window.location.hash;
+		
+		// If we have a hash
+		if (hash) {
+			hash = hash.replace(/^#/,'');
+			if (hash.match(/\d+/)) {
+				hash = hash.split(',');
+				// cycle through the pages and highlight those that are in the array
+				for (var i in this.pages) {
+					for (var j in hash) {
+						if (this.pages[i].pageID == hash[j]) {
+							this.select(i);
+						}
+					}
+				}
+				this.setPreviewImage();
+			}
+		}		
+	}
+	// ----------------------------
+	// Function: render()
+	//
+	// Cycle through and render all the pages in the book.
+	//
+	// Arguments
+	//    None
+	//
+	// Return Value / Effect
+	//    The page thumbnails should be appearing in the window
+	// ----------------------------
+	this.unrender = function() {
+		// Loop through the pages, render them all
+		for (var i in this.pages) {
+			// Render the page
+			this.pages[i].unrender();
+		}
+	}
+
+
 	// ----------------------------
 	// Function: selected()
 	//
@@ -119,9 +164,16 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The page is selected and highlighted.
 	//    The metadata reflects this accordingly.
 	// ----------------------------
-	this.select = function(idx) {
-		this.selectNone();
+	this.select = function(idx, between) {
+
+// NEH doesn't need this
+//		this.selectNone();
 		if (typeof idx != 'undefined' && idx >= 0 && idx < this.length()) {
+			if (!between) {
+				this.idxStartBetween = idx;
+			} else {
+				this.idxEndBetween = idx;		
+			}
 			this.pages[idx].select();
 			this.setMetadataFields();
 		}
@@ -140,6 +192,8 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The metadata reflects this accordingly.
 	// ----------------------------
 	this.unselect = function(idx) {
+		this.idxStartBetween = null;
+		this.idxEndBetween = null;
 		this.pages[idx].unselect();
 		this.setMetadataFields();
 	}
@@ -156,7 +210,12 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	// Return Value / Effect
 	//    The page is highlighted
 	// ----------------------------
-	this.highlight = function(idx) {
+	this.highlight = function(idx, between) {
+		if (!between) {
+			this.idxStartBetween = idx;
+		} else {
+			this.idxEndBetween = idx;		
+		}
 		this.pages[idx].highlight();
 		this.setMetadataFields();
 	}
@@ -173,6 +232,8 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The page is not highlighed
 	// ----------------------------
 	this.unhighlight = function(idx) {
+		this.idxStartBetween = null;
+		this.idxEndBetween = null;
 		this.pages[idx].unhighlight();
 		this.setMetadataFields();
 	}
@@ -219,15 +280,24 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	// ----------------------------
 	this.selectBetween = function() {
 		// Loop through the pages, select them all
-		var idxA = this.firstHighlightIndex();
-		var idxB = this.lastHighlightIndex();
-		var i;
-		for (var i in this.pages) {
-			if (i >= idxA && i <= idxB)
-				this.pages[i].highlight();
+		// var idxA = this.firstHighlightIndex();
+		var idxA = this.idxStartBetween;
+		var idxB = this.idxEndBetween;
+
+		if (idxA && idxB) {
+			if (idxA > idxB) {
+				idxB = this.idxStartBetween;
+				idxA = this.idxEndBetween;
+			}
+			var i;
+			for (var i in this.pages) {
+				if (i >= idxA && i <= idxB)
+					this.pages[i].highlight();
+			}
+			this.setMetadataFields();
+			this.setPreviewImage();
+			this.lastThumbClickIdx = null;
 		}
-		this.setMetadataFields();
-		this.setPreviewImage();
 	}
 
 	// ----------------------------
@@ -243,6 +313,8 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The metadata reflects this accordingly.
 	// ----------------------------
 	this.selectNone = function() {
+		this.idxStartBetween = null;
+		this.idxEndBetween = null;
 		// Loop through the pages, unselect all
 		for (var i in this.pages) {
 			if (this.pages[i]) {
@@ -266,6 +338,8 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The metadata reflects this accordingly.
 	// ----------------------------
 	this.selectAlternate = function() {
+		this.idxStartBetween = null;
+		this.idxEndBetween = null;
 		// Loop through the pages, select every other one
 		for (var i in this.pages) {
 			if (i % 2 == 1) {
@@ -292,6 +366,8 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    The metadata reflects this accordingly.
 	// ----------------------------
 	this.selectInverse = function() {
+		this.idxStartBetween = null;
+		this.idxEndBetween = null;
 		// Loop through the pages, invert the selection
 		for (var i in this.pages) {
 			if (this.pages[i].highlighted) {
@@ -493,7 +569,7 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 //		for (var i in this.pages) {
 			this.pages[0].metadata.unrender();
 //		}
-		Dom.get('sequence_number').innerHTML = '[Multiple Pages Selected]';
+		Dom.get('sequence_number').innerHTML = '<span style="color:#f60">[Multiple Pages Selected]</span>';
 		this.enableMetadata();
 	}
 
@@ -572,7 +648,9 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 	//    An object suitable for giving to YUI's ColumnDefs of a data table
 	// ----------------------------
 	this.getTableColumns = function () {
-		return this.pages[0].metadata.getTableColumns();
+		if (this.pages[0]) {
+			return this.pages[0].metadata.getTableColumns();
+		}
 	}
 
 
@@ -777,16 +855,19 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 // 			}
 			Dom.get('preview_img').src = arrHighlighted[0].urlPreview;
 			Dom.setStyle('preview_img', 'cursor', "url('"+sBaseUrl+"/inc/magnifier/assets/mag-cursor.gif'),auto");
+			Dom.get('btnZoomImage').style.display = 'block';
 
 		} else if (arrHighlighted.length > 1) {
 			Dom.get('preview_img').src = imgMultiSelect.src;
 			Dom.setStyle('preview_img', 'cursor', "default");
 			Scanning.magnifier.kill();
+			Dom.get('btnZoomImage').style.display = 'none';
 		} else {
 			// There zero or more than one, clear the metadata.
 			Dom.get('preview_img').src = imgSpacer.src;
 			Dom.setStyle('preview_img', 'cursor', "default");
 			Scanning.magnifier.kill();
+			Dom.get('btnZoomImage').style.display = 'none';
 		}
 
 	}
@@ -828,6 +909,30 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 			ret.push(this.pages[i].elemThumbnailLI.id);
 		}
 		return ret;
+	}
+	
+	this.sort = function(sortby) {
+		if (this.nofilter) {
+			return;
+		}
+		this.unrender();
+		if (sortby == 'natural') {
+			this.pages.sort(function(a,b) {
+				if (int(a.metadata.sequence) < int(b.metadata.sequence)) {
+					 return -1
+				} else if (int(a.metadata.sequence) > int(b.metadata.sequence)) {
+					 return 1				
+				} else {
+					return 0;
+				}
+			});
+		} else if (sortby == 'size') {
+			
+		} else if (sortby == 'size_reversed') {
+
+		}
+		this.render();
+		this.currentSort = sortby;
 	}
 }
 

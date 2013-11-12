@@ -863,6 +863,9 @@ td.yui-dt-last {
 	display: block;
 	float: left;
 }
+#preview {
+	position: relative;
+}
 #thumbs, #list, #thumbs_missing { /* Important that these have the same size */
 	height: 23.1em;
 	overflow: auto;
@@ -902,6 +905,11 @@ td.yui-dt-last {
 #sliderbg {
 	float: right;
 	background: url(../images/icons/slider-bg-h.gif) no-repeat;
+	width: 110px;
+	margin-right: 7px;
+}
+#slider-bg {
+ 	background: url(../images/icons/slider-bg-h.gif) no-repeat;
 	width: 110px;
 	margin-right: 7px;
 }
@@ -1232,7 +1240,8 @@ td.yui-dt-last {
 .yui-button#btnSelectAlternate,
 .yui-button#btnSelectInverse,
 .yui-button#btnToggleThumbs,
-.yui-button#btnToggleList{
+.yui-button#btnToggleList, 
+.yui-button#btnZoomImage {
 	background: url(http://yui.yahooapis.com/2.9.0/build/assets/skins/sam/sprite.png) repeat-x 0 0;
 	padding:  0 1px;
 	border: 0;
@@ -1244,12 +1253,23 @@ td.yui-dt-last {
 .yui-button#btnSelectAlternate button,
 .yui-button#btnSelectInverse button,
 .yui-button#btnToggleThumbs button,
-.yui-button#btnToggleList button {
+.yui-button#btnToggleList button, 
+.yui-button#btnZoomImage button {
 	text-indent: 1.5em;
 	padding: 1px 3px;
 	color: #000;
 	border: 1px solid #999;
 	border-radius: 4px 4px 4px 4px;
+}
+button#btnZoomImage-button {
+	width: 22px;
+}
+.yui-button#btnZoomImage {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	height: 21px;
+	display: none;
 }
 .yui-button#btnToggleThumbs button,
 .yui-button#btnToggleList button {
@@ -1271,6 +1291,9 @@ td.yui-dt-last {
 #btnToggleThumbs.yui-button-checked button, 
 #btnToggleList.yui-button-checked button {
 	border-color: #304369;
+}
+.yui-button#btnZoomImage button {
+	background: url(../images/icons/zoom.png) 2px 50%  no-repeat;	
 }
 .yui-button#btnSelectAll button {
 	background: url(../images/icons/application_icons_all.png) 2px 50%  no-repeat;	

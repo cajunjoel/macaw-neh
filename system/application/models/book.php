@@ -115,6 +115,24 @@ class Book extends Model {
 	}
 
 	/**
+	 * Get the barcode from an item_id
+	 *
+	 * Returns the barcode if found, null if not found.
+	 *
+	 * @param string [$id] The ID of the item in question
+	 */
+	function get_barcode($id) {
+			$this->db->select('barcode');
+			$this->db->where('id', $id);
+			$item = $this->db->get('item');
+			if (isset($item)) {
+				$row = $item->row();
+				return $row->barcode;
+			}
+			return null;
+	}
+
+	/**
 	 * Determine whether an item exists
 	 *
 	 * Query they database for the identiifer. If we get a non-zero
@@ -430,6 +448,146 @@ class Book extends Model {
 			}
 			$p->is_missing = ($p->is_missing ? $p->is_missing == 't' : false);
 		}
+		return $pages;
+	}
+
+	function get_all_pages() {
+		$thumb_path = $this->get_path('thumbnail');
+		$preview_path = $this->get_path('preview');
+		$scans_path = $this->get_path('original');
+
+		// args = /sort/fieldname/filter/fieldname=value/page/4
+		
+		$orderby = false;
+		$page = 1;
+		$perpage = 10;
+		$offset = 0;
+		
+		// Get the PAGE_IDs that correspond to the pages we want
+		$args = func_get_args();
+		$args = $args[0];
+		
+		$this->db->join('metadata', 'metadata.page_id = page.id', 'left');
+		$this->db->distinct();
+		$this->db->select('page.id');
+//		$this->db->or_where('1','1');
+		
+//		print "<pre>";
+
+		while (count($args)) {
+			$type = array_shift($args);
+
+
+			if ($type == 'sort') {
+				if (preg_match('/=/', $args[0])) {
+					$f = array_shift($args);
+					$orderby = $f;	
+					$f = explode('=', $f);
+					$this->db->order_by($f[0], $f[1]);
+					$this->db->select($f[0]);
+				}
+			}
+			if ($type == 'filter') {
+				if (preg_match('/=/', $args[0])) {
+					$f = explode('=', array_shift($args));
+					$this->db->or_where('("fieldname" = \''.$f[0].'\' and "value" = \''.$f[1].'\')');
+				}				
+			}
+			if ($type == 'page') {
+				if (preg_match('/[0-9]/', $args[0])) {
+					$page = array_shift($args);
+				}
+			}
+		}
+		
+		// Get the pages
+		if (!$orderby) {
+			$this->db->order_by('sequence_number', 'asc');
+			$this->db->select('sequence_number');
+		}
+		if ($page) {
+			$this->db->limit($perpage, ($perpage * ($page-1)));
+		}
+
+		$query = $this->db->get('page');
+		$pages = $query->result();
+//		print $this->db->last_query()."\n\n";
+
+		$page_ids = array();
+		foreach ($pages as $p) {
+			$page_ids[] = $p->id;
+		}
+
+		// Now that we have a list of page_ids, we can get their records		
+		if (!count($page_ids)) {
+			return array();
+		}
+		$this->db->where('id in ('.implode(',', $page_ids).')');
+		$query = $this->db->get('page');
+		$pages = $query->result();
+		// Get the metadata for this item so we can merge it into the page infos.
+		$this->db->where('page_id in ('.implode(',', $page_ids).')');
+		$query2 = $this->db->get('metadata');
+		$metadata = $query2->result();
+		
+		// Merge the data together (don't want to use a crosstab or pivot since it's DB-specific)
+		foreach ($pages as $p) {
+			if (preg_match('/archive\.org\/download/', $p->filebase)) {
+				$p->thumbnail = $p->filebase.'_thumb.'.$p->extension;
+				$p->preview = $p->filebase.'_medium.'.$p->extension;
+			} else {
+				// Take the filebase and convert it into the proper filenames for preview and thumbnail files
+				$p->thumbnail = $thumb_path.'/'.$p->filebase.'.'.$this->cfg['thumbnail_format'];
+				$p->preview = $preview_path.'/'.$p->filebase.'.'.$this->cfg['preview_format'];
+				$p->scan_filename = $p->filebase.'.'.$p->extension;
+				$p->scan = $scans_path.'/'.$p->scan_filename;
+			}
+			// Make a more human readable of "250 K" or "1.5 MB"
+			$p->size = ($p->bytes < 1048576
+			            ? number_format($p->bytes/1024, 0).' K'
+			            : number_format($p->bytes/(1024*1024), 1).' M');
+
+			foreach ($metadata as $row) {
+				// TODO: This can't be using names of fields!!
+				// It needs to be smarter and make arrays when necessary
+
+				if ($row->page_id == $p->id) {
+					$p->{$row->fieldname} = $row->value.'';
+				}
+			}
+			$p->is_missing = ($p->is_missing ? $p->is_missing == 't' : false);
+		}
+
+		// Manually sort here
+		if ($orderby == 'sequence_number=asc') {
+			function cmp1($a, $b) {
+				if ($a->sequence_number == $b->sequence_number) {	return 0;	}
+				return ($a->sequence_number < $b->sequence_number ? -1 : 1);
+			}
+			usort($pages, 'cmp1');
+
+		} elseif ($orderby == 'sequence_number=desc') {
+			function cmp1($a, $b) {
+				if ($a->sequence_number == $b->sequence_number) {	return 0;	}
+				return ($a->sequence_number > $b->sequence_number ? -1 : 1);
+			}
+			usort($pages, 'cmp1');
+
+		} elseif ($orderby == 'size=asc') {
+			function cmp2($a, $b) {
+				if ($a->width == $b->width) {	return 0;	}
+				return ($a->width < $b->width ? -1 : 1);					
+			}				
+			usort($pages, 'cmp2');
+
+		} elseif ($orderby == 'size=desc') {
+			function cmp3($a, $b) {
+				if ($a->width == $b->width) {	return 0;	}
+				return ($a->width > $b->width ? -1 : 1);					
+			}
+			usort($pages, 'cmp3');				
+		}
+
 		return $pages;
 	}
 
@@ -1187,6 +1345,33 @@ class Book extends Model {
 			       to_char(avg(age(date_review_end, date_scanning_start)),'fmmi') || 'm' from item) as avg;"
 		);
 		return $q->row();
+	}
+
+	function get_status_counts_neh() {
+		$data = new stdClass();
+
+		$q = $this->db->query(
+			"select 
+			   (select count(*) from item) as books,
+			   (select count(*) from page) as pages,
+			   (select count(*) from item where status_code = 'completed') as completed
+			   ;"
+		);
+		$r = $q->row();
+		
+		$data->type_photo = 0;
+		$data->type_drawing = 0;
+		$data->type_print = 0;
+		$data->type_diagram = 0;
+		$data->type_map = 0;
+
+		$data->completed = $r->completed;
+		$data->total_items = $r->books;
+		$data->total_pages = $r->pages;
+		$data->pct_complete = 0;
+		$data->pages_per_day = 0;
+	
+		return $data;
 	}
 
 	function get_last_status() {

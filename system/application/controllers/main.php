@@ -205,9 +205,13 @@ class Main extends Controller {
 					redirect($this->config->item('base_url').'scan/review');
 	
 				} elseif ($this->book->status == 'reviewed' || $this->book->status == 'completed' || $this->book->status == 'exporting' || $this->book->status == 'archived'){			
-					$this->session->set_userdata('warning', 'This item can no longer be edited. You are seeing the item\'s history instead.');
-					redirect($this->config->item('base_url').'scan/history');
-					
+					if ($this->book->status == 'reviewed' && $this->user->has_permission('admin')) {
+						redirect($this->config->item('base_url').'scan/review');					
+					} else {
+						$this->session->set_userdata('warning', 'This item can no longer be edited. You are seeing the item\'s history instead.');
+						redirect($this->config->item('base_url').'scan/history');
+					}
+										
 				} else {
 					redirect($this->config->item('base_url').'main');
 				}

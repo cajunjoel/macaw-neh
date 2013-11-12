@@ -72,6 +72,7 @@
 				<?php if ($is_admin) { ?>
 				<li class="top"><a href="#admin">Admin</a>
 					<ul>
+						<li><a href="/scan/review/all"><img src="/images/05_insert_missing_pages_icon_sm.png">View All Page Images</a></li>
 						<li><a href="/admin/account"><img src="/images/08_list_accounts_icon_sm.png">List Accounts</a></li>
 						<li><a href="/admin/queues"><img src="/images/09_queues_icon_sm.png">Queues</a></li>
 						<li><a href="/admin/logs"><img src="/images/10_view_logs_icon_sm.png">View Logs</a></li>

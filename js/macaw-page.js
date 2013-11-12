@@ -103,7 +103,25 @@ YAHOO.macaw.Page = function(parent, data, mdModules) {
 		if (this.highlighted) {
 			this.highlight(); // Seems redundant, but it works
 		}
+	}
 
+
+	// ----------------------------
+	// Function: unrender()
+	//
+	//
+	// Arguments
+	//    none
+	//
+	// Return Value / Effect
+	//    Thumbnail removed created, click event is being watched for
+	// ----------------------------
+	this.unrender = function() {
+		YAHOO.util.Event.removeListener(this.elemThumbnailLI, "click");
+		var el = this.elemThumbnailLI.parentNode.removeChild(this.elemThumbnailLI);
+		this.rendered = false;
+		this.highlighted = false;
+		this.selected = false;
 	}
 
 	this.delete = function() {
@@ -175,7 +193,7 @@ YAHOO.macaw.Page = function(parent, data, mdModules) {
 			return;
 		}
 		// Set highlight around the thumbnail image
-		Dom.setStyle(this.elemThumbnailIMG, 'border', '2px solid #000099');
+		Dom.setStyle(this.elemThumbnailIMG, 'border', '2px solid #f60');
 		// Mark ourselves as highlighted
 		this.highlighted = true;
 		if (this.parent.parent.objDataTable) {

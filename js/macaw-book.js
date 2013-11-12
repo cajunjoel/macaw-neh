@@ -103,6 +103,9 @@ YAHOO.macaw.Book = function() {
 	//    No return value. Assume that the data is saved, present an error if not.
 	// ----------------------------
 	this.save = function(e, finishing, finishing_later, suppress_dialog) {
+		if (showAllImages == 1) {
+			return;
+		}
 		// This is the callback to handle the saving of the data.
 		var saveCallback = {
 			success: function (o){
@@ -301,12 +304,16 @@ YAHOO.macaw.Book = function() {
 			// Render the datatable
 			this._renderDataTable();
 		}
-
+	
+		listItems = ['Delete Page'];
+		if (showAllImages == 1) {
+			listItems = ['Delete Page', 'Edit Item'];
+		}
 		// Create the popup menu, later we'll associate it to the thumbnail images
 		this.contextMenu = new YAHOO.widget.ContextMenu(
 			'pagecontextmenu', {
 			trigger: this.pages.listIDs(),
-			itemdata: ['Delete Page'],
+			itemdata: listItems,
 			lazyload: true
 		});
 		contextMenuClick = function(p_sType, p_aArgs) {
@@ -316,8 +323,12 @@ YAHOO.macaw.Book = function() {
 			if (oItem) {
 				oLI = oTarget.nodeName.toUpperCase() == "LI" ? oTarget : YAHOO.util.Dom.getAncestorByTagName(oTarget, "LI");
 				switch (oItem.index) {
-					case 0: oBook.deletePage(oLI.id);
-					break;
+					case 0: 
+						oBook.deletePage(oLI.id);
+						break;
+					case 1: 
+						oBook.editItem(oLI.id);
+						break;
 				}
 			}		
 		}
@@ -325,7 +336,28 @@ YAHOO.macaw.Book = function() {
 			this.contextMenu.subscribe("click", contextMenuClick, null, oBook);
 		}
 		this.contextMenu.subscribe("render", renderContextMenu, null, oBook);
+
+		// Preselect any pages from the URL
+		this.pages.preSelect();
 	}
+
+
+	this.unrender = function(divThumbs, divDataTable) {
+		// Save where we are going to place the thumbnail images
+		if (divThumbs) this.elemThumbnails = Dom.get(divThumbs);
+
+		// Save the div in which the DataTable will reside
+		if (divDataTable) {
+			this.elemDataTable = Dom.get(divDataTable);
+		}
+		this.pages.unrender();
+
+		if (divDataTable) {
+			// Render the datatable
+			this._unrenderDataTable();
+		}
+	}
+
 	
 	this.deletePage = function(LIid) {
 		
@@ -351,6 +383,21 @@ YAHOO.macaw.Book = function() {
 		General.showYesNo('Are you sure you want to delete this page? This cannot be undone.', doDelete);
 		
 	}
+
+	this.editItem  = function(LIid) {
+		// Get the index into the array of the page we are deleting
+		idx = oBook.pages.find('id', LIid);
+		// Remove the elements from the page. This also marks it as deleted.
+		itemID = oBook.pages.pages[idx].itemID;
+		pageIDs = new Array();
+		for (var i in oBook.pages.pages) {
+			if (oBook.pages.pages[i].highlighted && oBook.pages.pages[i].itemID == itemID) {
+				pageIDs.push(oBook.pages.pages[i].pageID);
+			}
+		}
+		window.open('/scan/review_item/'+itemID+'/'+pageIDs.toString());
+	}
+
 
 	// ----------------------------
 	// Function: zoom()
@@ -408,6 +455,21 @@ YAHOO.macaw.Book = function() {
 			mt.style.height = int(height - infoOffset + 12) + 'px';
 		}
 	}
+	
+	// ----------------------------
+	// Function: zoomImage()
+	//
+	// Open the current preview image in a new window
+	//
+	// Arguments
+	//		none
+	//
+	// Return Value / Effect
+	//    none
+	// ----------------------------
+	this.zoomImage = function() {
+		window.open(preview_img.src);
+	}
 
 
 	// ----------------------------
@@ -427,7 +489,8 @@ YAHOO.macaw.Book = function() {
 		// Get the element that we clicked on
 		var el = YAHOO.util.Event.getTarget(e);
 		if (el.id == 'thumbs') {
-			this.pages.selectNone();
+// NEH doesn't need this
+//		this.pages.selectNone();
 		}
 	}
 
@@ -524,6 +587,11 @@ YAHOO.macaw.Book = function() {
 // IMPORTANT! Drag-Drop on the data table is disabled
 //			this.DTDrags[id] = new YAHOO.macaw.ddDataTable(id);
 		}
+	}
+
+
+	this._unrenderDataTable = function() {
+			oBook.objDataTable.deleteRows(0,10000);
 	}
 
 	// ----------------------------
@@ -659,10 +727,14 @@ YAHOO.macaw.Book = function() {
 	this._doSelectHandler = function(idx) {
 		// Halt this procedure if we are adding missing pages
 		if (keyShift) { // Was shift held down?
-			this.pages.highlight(idx);
+		  if (this.pages.firstHighlightIndex()) {
+				this.pages.highlight(idx, true);
+			} else {
+				this.pages.highlight(idx, false);
+			}
 			this.pages.selectBetween(); // Highlight everything in between
 
-		} else if (keyAlt) { // Was Alt pressed,
+		} else { // Pretend like Alt was pressed
 			if (this.pages.selected(idx)) {
 				this.pages.unselect(idx);
 
@@ -675,8 +747,6 @@ YAHOO.macaw.Book = function() {
 				}
 			}
 
-		} else {
-			this.pages.select(idx);
 		}
 		this.pages.setPreviewImage();
 

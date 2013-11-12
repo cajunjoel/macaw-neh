@@ -373,7 +373,11 @@
 			};
 
 			// Call the URL to get the data
-			var transaction = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_thumbnails', loadDataCallback, null);
+			var url = sBaseUrl+'/scan/get_thumbnails';
+			if (showAllImages) {
+				url = sBaseUrl+'/scan/get_all_thumbnails';
+			}
+			var transaction = YAHOO.util.Connect.asyncRequest('GET', url, loadDataCallback, null);
 
 			// Set up the rest of the screen: set up the buttons
 			var obtnSave = new YAHOO.widget.Button("btnSave");
@@ -381,6 +385,9 @@
 
 			var obtnFinished = new YAHOO.widget.Button("btnFinished");
 			obtnFinished.on("click", oBook.finish, null, oBook);
+
+			var obtnZoomImage = new YAHOO.widget.Button("btnZoomImage");
+			obtnZoomImage.on("click", oBook.zoomImage, null, oBook);
 
 			//var obtnFinishLater = new YAHOO.widget.Button("btnFinishLater");
 			//obtnFinishLater.on("click", oBook.finishLater, null, oBook);

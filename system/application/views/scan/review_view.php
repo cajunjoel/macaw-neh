@@ -82,8 +82,8 @@
 				</div>
 			</div>
 			<div id="preview" class="yui-u" style="width: 31.5%; margin-left: 0; margin-right:.5em;">
-				
 				<a href="#" onClick="return General.showMagnifier();"><img src="<? echo $this->config->item('base_url'); ?>images/spacer.gif" border="0" id="preview_img" style="height: 100%; width: 100%;"></a>
+				<button id="btnZoomImage" title="View image in new window"></Button>
 				
 			</div>
 			<div id="save_buttons"> 
@@ -99,7 +99,9 @@
 		echo '<script type="text/javascript" src="'.$this->config->item('base_url').'plugins/metadata/'.$m.'.js"></script>'."\n";
 	} ?>
 	<script type="text/javascript">
-		<? foreach ($metadata_modules as $m) {echo 'Scanning.metadataModules.push(\''.$m.'\');'."\n";} ?>
+		<? if ($all) { echo "var showAllImages = 1;\n"; } else { echo "var showAllImages = 0;\n"; } ?>
+		<? foreach ($metadata_modules as $m) {echo 'Scanning.metadataModules.push(\''.$m.'\');'."\n\t\t";} ?>
+		
 		YAHOO.util.Event.onContentReady("preview_img", Scanning.initReview);
 		var styleSheet = YAHOO.util.StyleSheet('macaw_thumbs_css');
 	</script>
