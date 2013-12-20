@@ -396,7 +396,7 @@ class Common extends Controller {
 		$proc = new XSLTProcessor;
 		$ret = $xml->loadXML($text, LIBXML_NOERROR | LIBXML_NOWARNING);    // Load the MARC XML to convert to MODS
 		if ($ret) {
-			$xsl->load('inc/xslt/MARC21slim2MODS3-3.xsl');	// Get our XSL file from the LOC
+			$xsl->load('inc/xslt/MARC21slim2MODS3-4.xsl');	// Get our XSL file from the LOC
 			$proc->importStyleSheet($xsl); 					// attach the xsl rules
 			$tx = $proc->transformToXML($xml);
 			return $tx;										// Transform the MARC to MODS
@@ -561,6 +561,18 @@ class Common extends Controller {
 				'The following error occurred, most likely during a cron run: '."\r\n\r\n".$message
 			);
 			$this->CI->email->send();
+		}
+	}
+
+	function save_import_status($file = '', $value = 1, $message = '', $finished = 0) {
+		if ($file != '') {
+			write_file($file.'.txt', 
+				json_encode(array(
+					'message' => $message,
+					'finished' => $finished,
+					'value' => $value
+				))
+			);
 		}
 	}
 

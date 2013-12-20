@@ -902,6 +902,110 @@ class Main extends Controller {
 	}
 
 	/**
+	 * Display the CSV import page
+	 *
+	 * This function simply displays the CSV import form.
+	 *
+	 */
+	function import_neh() {
+		if (!$this->user->has_permission('scan')) {
+			$this->session->set_userdata('errormessage', 'You do not have permission to access that page.');
+			redirect($this->config->item('base_url').'main');
+			$this->logging->log('error', 'debug', 'Permission Denied to access '.uri_string());
+			return;
+		}
+
+		$this->load->view('main/import_neh_view');
+	}
+
+	/**
+	 * Import the CSV file 
+	 *
+	 * AJAX: This receives via a POST, the CSV file that is being imported. 
+	 * It intiates the import and returns an identifier that can be used
+	 * to monitor the progress of the import process. This is a 
+	 *
+	 */
+	function import_neh_upload() {
+		if (!$this->common->check_session(true)) {
+			return;
+		}
+		
+		// Make sure we have somewhere to save the file.
+		$dir = $this->cfg['data_directory'].'/import_export';
+		if (!file_exists($dir)) {
+			mkdir($dir);
+		}
+
+		// Get a temporary filename
+		$tempfilename = tempnam($dir, 'import-neh-');		
+		rename($tempfilename, $tempfilename.'.txt');
+		$tempfilename .= '.csv';
+// 		print_r($_FILES);
+// 		die;
+		
+		// Receive the CSV file 
+		if ($_FILES["userfile"]["error"] > 0) {
+			echo json_encode(array(
+				'error' => "Error ".$_FILES["userfile"]["error"]." uploading file.",
+			));
+		} else {
+			move_uploaded_file($_FILES["userfile"]["tmp_name"], $tempfilename);
+
+			// Spawn the import process (php index.php utils csv_import FILENAME.CSV)
+			chdir($this->cfg['base_directory']);
+			$cmd = PHP_BINDIR.'/php index.php cron import NEH '.$tempfilename.' > /dev/null 2>&1 &'; 
+			system($cmd);
+
+			// Give the filename back to the page.
+			echo json_encode(array(
+				'filename' => basename($tempfilename),
+				'cmd' => $cmd
+			));
+
+		}
+
+	}
+
+	/**
+	 * Monitor the progress while importing the CSV 
+	 *
+	 * JSON: Given the identifier of provided by import_upload(),
+	 * returns a value (from 0 to 100) of how far long we are in
+	 * the import process. Also returns an optional message that
+	 * may be used to indicate some status to the user during import.
+	 * When the value returned is equal to 100, the import process
+	 * is complete.
+	 *
+	 */
+	function import_neh_status($filename) {
+		if (!$this->common->check_session(true)) {
+			return;
+		}
+		
+		$dir = $this->cfg['data_directory'].'/import_export';
+		$fname = $dir.'/'.$filename.'.txt';
+
+		// Get the progress of the file
+		$string = read_file($fname); 
+		if ($string) {
+			$data = json_decode($string);
+	
+			// If the progres of the file is 100%, then it's safe to delete the progress file
+			// (By this time, the import file has already been cleaned out)
+			if ($data->finished == 1) {
+				unlink($fname);
+			}
+			// Send back the text
+		} else {
+			$string = '{"message":"","value":"","finished":"0"}';
+		} 
+		$this->common->ajax_headers();
+		echo $string;		
+	}
+
+
+	/**
 	 * Recursively get a single array of all files
 	 *
 	 * CLI: Given a path, recurse through the files and directories 

@@ -44,7 +44,8 @@
 				<li class="top"><a href="#create-new">Create New</a>
 					<ul>
 						<li><a href="/main/add"><img src="/images/01_manually_ad_icon_sm.png">Manually Add Item</a></li>
-						<li class="last"><a href="/main/import"><img src="/images/01_manually_ad_icon_sm.png">Create from CSV</a></li>
+						<li><a href="/main/import"><img src="/images/01_manually_ad_icon_sm.png">Create from CSV</a></li>
+						<li class="last"><a href="/main/import_neh"><img src="/images/01_manually_ad_icon_sm.png">Art of Life Import</a></li>
 					</ul>
 				</li>
 				<li class="top"><a href="#manage">Current Item</a>

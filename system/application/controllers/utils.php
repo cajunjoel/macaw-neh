@@ -347,7 +347,7 @@ class Utils extends Controller {
 				// For whatever reason, couldn't open the file.
 				// Umm... Didn't we just save the file?
 				echo "Could not open import file for reading.\n";
-				$this->_save_import_status($fname, 0, 'Could not open import file for reading.');
+				$this->common->save_import_status($fname, 0, 'Could not open import file for reading.');
 				return;		
 			} 
 	
@@ -355,14 +355,14 @@ class Utils extends Controller {
 			$fieldnames = @fgetcsv($infile, 8000, ',', '"');		
 			if ($fieldnames == FALSE) {
 				echo "Could not read the import file.\n";
-				$this->_save_import_status($fname, 0, 'Could not read the import file.');
+				$this->common->save_import_status($fname, 0, 'Could not read the import file.');
 				return;		
 			}
 			
 			// Is the first item in the first row the word "identifier"?
 			if (strtolower($fieldnames[0]) != 'identifier' && strtolower($fieldnames[0]) != 'barcode') {
 				echo "Invalid format. Identifier column is not supplied.\n";
-				$this->_save_import_status($fname, 0, 'Invalid format. Identifier column is not supplied.');
+				$this->common->save_import_status($fname, 0, 'Invalid format. Identifier column is not supplied.');
 				return;
 			}
 			
@@ -386,7 +386,7 @@ class Utils extends Controller {
 					}
 					$val = round($row/$lc*100);
 					// While importing, write our progress to "$filename.txt"
-					$this->_save_import_status($fname, $val);
+					$this->common->save_import_status($fname, $val);
 				}
 			}
 
@@ -403,7 +403,7 @@ class Utils extends Controller {
 			// When done, delete the import file
 			// Do not delete the status file
 			unlink($fname);
-			$this->_save_import_status(
+			$this->common->save_import_status(
 				$fname, 
 				100, 
 				'<h3 class="finished">Import complete!</h3>'.$imported.' items imported. '.$skipped.' items skipped.'.
@@ -415,18 +415,6 @@ class Utils extends Controller {
 		}
 	}
 	
-	function _save_import_status($file = '', $value = 1, $message = '', $finished = 0) {
-		if ($file != '') {
-			write_file($file.'.txt', 
-				json_encode(array(
-					'message' => $message,
-					'finished' => $finished,
-					'value' => $value
-				))
-			);
-		}
-	}
-
 
 	/**
 	 * Delete an entire item from Macaw

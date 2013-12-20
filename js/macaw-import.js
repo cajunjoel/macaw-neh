@@ -135,4 +135,130 @@
 	
 	};
 
+
+	ImportNEH = {
+		obtnImport: null,
+		progressBar: null,
+		currentFilename: null,
+		// ----------------------------
+		// Function: init()
+		//
+		// Sets up the page for importing
+		//
+		// Arguments
+		//    None
+		//
+		// ----------------------------
+		init: function() {
+			ImportNEH.obtnImport = new YAHOO.widget.Button("btnImport");
+			ImportNEH.obtnImport.on("click", ImportNEH.upload);			
+		},
+		
+		// ----------------------------
+		// Function: upload()
+		//
+		// ----------------------------
+		upload: function() {
+			var uploadCallback = {
+				upload: function(o) {
+					eval('var r = '+o.responseText);
+					if (r.redirect) {
+						window.location = r.redirect;
+					} else {
+						if (r.error) {
+							General.showErrorMessage(r.error);
+						} else {
+							// Start monitoring the processing of the file
+							ImportNEH.disableForm();
+ 							ImportNEH.monitorStart(r.filename);
+						}
+					}
+				},
+				failure: function(o) {
+					// Display a message to the user
+					ImportNEH.enableForm();
+					General.showErrorMessage('Error uploading the CSV file: '+o.statusText);
+				},
+				argument: []
+			}
+			var formObject = document.getElementById('upload_form');
+			YAHOO.util.Connect.setForm(formObject, true);
+			
+			var cObj = YAHOO.util.Connect.asyncRequest('POST', sBaseUrl+'/main/import_neh_upload', uploadCallback);			
+		},
+		
+		// ----------------------------
+		// Function: monitorStart()
+		//
+		// ----------------------------
+		monitorStart: function(filename) {
+			if (ImportNEH.progressBar != null) {
+				ImportNEH.progressBar.destroy();
+				ImportNEH.progressBar = null;
+			}
+			ImportNEH.currentFilename = filename;
+			// Show the monitor for importing
+			Dom.setStyle('progress','display','block');
+			// Initialize the progress bar if necesary (if not, reset to zero)
+// 			ImportNEH.progressBar = new YAHOO.widget.ProgressBar({
+// 				value:0, 
+// 				minValue:0, 
+// 				maxValue:100,
+// 				width:"400px",
+// 				height:"35px"
+// 			}).render('bar');
+
+			// Start querying the server for information
+			setTimeout("ImportNEH.updateBar()", 1000);
+		},
+
+		// ----------------------------
+		// Function: updateBar()
+		//
+		// ----------------------------
+		updateBar: function() {
+			var callback = {
+				success: function(o) {
+					eval('var r = '+o.responseText);
+					if (r.redirect) {
+						window.location = r.redirect;
+					} else {
+						Dom.get('bar').innerHTML = parseInt(r.value) + ' items imported...';
+						Dom.get('message').innerHTML = '';
+						if (r.message != '') {
+							Dom.get('message').innerHTML = r.message;
+						}
+						if (r.finished == 1) {
+							ImportNEH.enableForm();
+						} else {
+							setTimeout("ImportNEH.updateBar()", 1000);
+						}
+					}
+				},
+				failure: function(o) {},
+				argument: []
+			}
+			var cObj = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/main/import_neh_status/'+ImportNEH.currentFilename, callback);			
+		},
+		
+		// ----------------------------
+		// Function: enableForm()
+		//
+		// ----------------------------
+		enableForm: function() {
+			ImportNEH.obtnImport.set('disabled', false);
+			Dom.get('userfile').disabled = false;
+		},
+
+		// ----------------------------
+		// Function: disableForm()
+		//
+		// ----------------------------
+		disableForm: function() {
+			ImportNEH.obtnImport.set('disabled', true);
+			Dom.get('userfile').disabled = true;
+		}
+	
+	};
+
 })();
