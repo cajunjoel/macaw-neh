@@ -519,6 +519,16 @@ YAHOO.macaw.Book = function() {
 	//	}
 	}
 
+	this.keyPress = function(e) {
+		if (e.type == 'keypress') {
+			for(i=0; i<oBook.pages.pages[0].metadata.modules.length; i++) {
+				oBook.pages.pages[0].metadata.modules[i].keyPress(String.fromCharCode(e.keyCode));
+			}
+		}
+	}
+	
+	
+
 	// ----------------------------
 	// Function: _initDataTable()
 	//

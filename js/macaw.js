@@ -157,6 +157,11 @@ function checkKey(e) {
 		return false;
 	}
 
+	// Pass control to NEH keystroke handling
+	if (oBook) {
+		oBook.keyPress(e);
+	}
+	
 	keyAlt = isAlt(e);
 	keyCtrl = isCtrl(e);
 	keyShift = isShift(e);
