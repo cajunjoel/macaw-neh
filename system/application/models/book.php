@@ -465,7 +465,9 @@ class Book extends Model {
 		
 		// Get the PAGE_IDs that correspond to the pages we want
 		$args = func_get_args();
-		$args = $args[0];
+		if (count($args) > 0) {
+			$args = $args[0];
+		}
 		
 		$this->db->join('metadata', 'metadata.page_id = page.id', 'left');
 		$this->db->distinct();
@@ -643,7 +645,7 @@ class Book extends Model {
 				'page_id'   => $page,
 				'fieldname' => strtolower($name),
 				'counter'   => $counter,
-				'value'     => $value
+				((strlen($value) > 1000) ? 'value_large' : 'value') => $value
 			);
 
 			$this->db->insert('metadata', $data);
