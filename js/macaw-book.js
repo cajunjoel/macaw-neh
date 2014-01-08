@@ -464,8 +464,10 @@ YAHOO.macaw.Book = function() {
 		}
 
 		// Fire the scrolling event handler to make things happen
-		this.pages.scroll();
-
+		if (this.pages) {
+			this.pages.scroll();
+		}
+		
 	}
 	
 	// ----------------------------
@@ -555,13 +557,13 @@ YAHOO.macaw.Book = function() {
 	//    The YUI data table is created, even if it's hidden on the page.
 	// ----------------------------
 	this._initDataTable = function() {
-		var formatThumb = function(elCell, oRecord, oColumn, oData) {
-			elCell.innerHTML = '<img src="'+oData+'" height="24" border="0">';
-		}
+// 		var formatThumb = function(elCell, oRecord, oColumn, oData) {
+// 			elCell.innerHTML = '<img src="'+oData+'" height="24" border="0">';
+// 		}
 		var myData = {pages: []};
 		var myColumnDefs = [
-			{key:"thumbnail",   label:'',     className:'default-dt-field', formatter:formatThumb},
-			{key:"filebase",    label:'File', className:'default-dt-field' },
+// 			{key:"thumbnail",   label:'',     className:'default-dt-field', formatter:formatThumb},
+// 			{key:"filebase",    label:'File', className:'default-dt-field' },
 			{key:"sequence",    label:'Seq.', className:'default-dt-field', formatter:YAHOO.widget.DataTable.formatNumber}
 			// This must come from the individual metadata modules
 		];

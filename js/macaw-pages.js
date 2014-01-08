@@ -960,8 +960,6 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 		// Get the top X and bottom X of the div of the thumbnails
 		var r = Dom.getRegion('thumbs');
 		// Cycle through the thumbnails and determine if they are within this range.
-		pvw = Dom.get('preview');
-		pvw.innerHTML = "";
 		for (var i in oBook.pages.pages) {
 			pg = oBook.pages.pages[i];
 			// Render the page

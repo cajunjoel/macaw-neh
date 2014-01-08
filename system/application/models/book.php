@@ -307,7 +307,11 @@ class Book extends Model {
 				}
 				break;
 			case 'reviewed':
-				if ($status != 'reviewed' && $status != 'reviewing'  && $status != 'exporting' && $status != 'error') {
+				if ($status != 'reviewing' && !$this->CI->user->has_permission('admin')) {
+					$this->last_error = 'Only admins can set status to "'.$status.'" when item has status "reviewed".';
+					throw new Exception($this->last_error);				
+				
+				} else if ($status != 'reviewed' && $status != 'exporting' && $status != 'error') {
 					$this->last_error = 'Cannot set status to "'.$status.'" when item has status "reviewed".';
 					throw new Exception($this->last_error);
 				}
