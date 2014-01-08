@@ -63,5 +63,9 @@ class Help extends Controller {
 	function help_index() {
 		$this->load->view('help/help_index_view');
 	}
+	
+	function neh() {
+		$this->load->view('help/neh_view');
+	}
 
 }
