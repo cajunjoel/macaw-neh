@@ -524,9 +524,10 @@ class Scan extends Controller {
 			$data['metadata_modules'] = array('NEH_filter');
 			$data['ia_identifier'] = '';
 			$data['item_title'] = 'Viewing all page images';	
+			$data['users'] = $this->user->get_list();
 		}
 		$data['all'] = $all;
-		
+
 		$this->load->view('scan/review_view', $data);
 		$this->logging->log('access', 'info', 'Scanning review begins for '.$this->book->barcode);
 		$this->logging->log('book', 'info', 'Scanning review begins.', $this->book->barcode);

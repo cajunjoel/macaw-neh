@@ -25,6 +25,7 @@ YAHOO.macaw.Page = function(parent, data, mdModules) {
 	this.metadata = new YAHOO.macaw.Metadata(this, data, mdModules);
 	this.parent = parent;
 	this.isMissing = data.is_missing;
+	this.isVisible = false;
 
 	this.selected = false;
 	this.highlighted = false;
@@ -72,8 +73,11 @@ YAHOO.macaw.Page = function(parent, data, mdModules) {
 
 		// Create the thumbnail image element
 		var new_img = Dom.get(document.createElement('img'));
+		this.imgThumb = new_img;
 		Dom.addClass(new_img, 'image');
-		Dom.get(new_img).src = this.urlThumbnail;
+// 		if (this.isVisible) {
+// 			Dom.get(new_img).src = this.urlThumbnail;
+// 		}
 		//Dom.get(new_img).width = 100;
 
 		// Create the thumbnail caption element
@@ -105,10 +109,8 @@ YAHOO.macaw.Page = function(parent, data, mdModules) {
 		}
 	}
 
-
 	// ----------------------------
 	// Function: unrender()
-	//
 	//
 	// Arguments
 	//    none

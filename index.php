@@ -1,5 +1,9 @@
 <?php
 
+// Things time out if we don't do this.
+
+ini_set('max_execution_time', 300);
+
 /*
 |---------------------------------------------------------------
 | DEFAULT TIMEZONE

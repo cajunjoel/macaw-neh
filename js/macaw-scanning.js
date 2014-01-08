@@ -354,6 +354,7 @@
 			// the data to the book object and then renders the book on the page.
 			var loadDataCallback = {
 				success: function (o){
+					oBook.showSpinner(false);
 					eval('var r = '+o.responseText.replace(/&amp;/g, '&'));
 					if (r.redirect) {
 						window.location = r.redirect;
@@ -367,6 +368,7 @@
 					}
 				},
 				failure: function (o){
+					oBook.showSpinner(false);
 					General.showErrorMessage('There was a problem retrieving the metadata for the pages. Please try reloaing the page. If it helps, the error was:<blockquote style="font-weight:bold;color:#990000;">'+o.statusText+"</blockquote>");
 				},
 				scope: this
@@ -377,6 +379,7 @@
 			if (showAllImages) {
 				url = sBaseUrl+'/scan/get_all_thumbnails';
 			}
+			oBook.showSpinner(true);
 			var transaction = YAHOO.util.Connect.asyncRequest('GET', url, loadDataCallback, null);
 
 			// Set up the rest of the screen: set up the buttons

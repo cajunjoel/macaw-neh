@@ -10,6 +10,7 @@
 <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.9.0/build/utilities/utilities.js&2.9.0/build/datasource/datasource-min.js&2.9.0/build/autocomplete/autocomplete-min.js&2.9.0/build/container/container-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/button/button-min.js&2.9.0/build/json/json-min.js&2.9.0/build/swf/swf-min.js&2.9.0/build/charts/charts-min.js&2.9.0/build/paginator/paginator-min.js&2.9.0/build/datatable/datatable-min.js&2.9.0/build/history/history-min.js&2.9.0/build/resize/resize-min.js&2.9.0/build/layout/layout-min.js&2.9.0/build/logger/logger-min.js&2.9.0/build/progressbar/progressbar-min.js&2.9.0/build/slider/slider-min.js&2.9.0/build/stylesheet/stylesheet-min.js&2.9.0/build/tabview/tabview-min.js&2.9.0/build/treeview/treeview-min.js&2.9.0/build/uploader/uploader-min.js"></script> 
 <!-- http://developer.yahoo.com/yui/articles/hosting/?animation&autocomplete&base&button&charts&connection&container&datasource&datatable&dom&dragdrop&element&event&fonts&grids&history&json&layout&logger&menu&paginator&progressbar&reset&resize&slider&stylesheet&swf&tabview&treeview&uploader&yahoo&MIN -->
 
+<script type="text/javascript" src="<? echo $this->config->item('base_url'); ?>js/spin.js"></script>
 <script type="text/javascript" src="<? echo $this->config->item('base_url'); ?>inc/magnifier/image-magnifier.js"></script>
 <script type="text/javascript" src="<? echo $this->config->item('base_url'); ?>inc/swf/swfobject.js"></script>
 <script type="text/javascript" src="<? echo $this->config->item('base_url'); ?>main/js_config"></script>

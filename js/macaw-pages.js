@@ -934,6 +934,48 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 		this.render();
 		this.currentSort = sortby;
 	}
+	
+
+	// ----------------------------
+	// Function: scroll()
+	//
+	// Handle scrolling and the visiblity of the thumbnails.
+	// 
+	// We only want to load the thumbnail images for those images that are visible
+	// on the screen. We'll unload those that are hidden. This allows us to preserve
+	// memory on the client.
+	//
+	// Determine the coordinates of the thumnail scrolling div and which of the thumbnails
+	// are contained within that div. (Later we'll adjust it for a small range of things that
+	// are off the edges of the screen.)
+	//
+	// Arguments
+	//    none
+	//
+	// Return Value / Effect
+	//    The thumnail images are shown or hidden as appropriate.
+	// ----------------------------
+	this.scroll = function() {
+		scrollMargin = 1000;
+		// Get the top X and bottom X of the div of the thumbnails
+		var r = Dom.getRegion('thumbs');
+		// Cycle through the thumbnails and determine if they are within this range.
+		pvw = Dom.get('preview');
+		pvw.innerHTML = "";
+		for (var i in oBook.pages.pages) {
+			pg = oBook.pages.pages[i];
+			// Render the page
+			r2 = Dom.getRegion(pg.elemThumbnailLI);
+			if (r2.top >= (r.top - scrollMargin) && r2.top <= (r.bottom + scrollMargin)) {
+				pg.isVisible = true;
+				Dom.get(pg.elemThumbnailIMG).src = pg.urlThumbnail;			
+			} else {
+				pg.isVisible = false;
+				Dom.get(pg.elemThumbnailIMG).src = null;		
+			}
+		}		
+	}
+	
 }
 
 

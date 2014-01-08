@@ -460,7 +460,7 @@ class Book extends Model {
 		
 		$orderby = false;
 		$page = 1;
-		$perpage = 10;
+		$perpage = 100;
 		$offset = 0;
 		
 		// Get the PAGE_IDs that correspond to the pages we want
@@ -478,8 +478,6 @@ class Book extends Model {
 
 		while (count($args)) {
 			$type = array_shift($args);
-
-
 			if ($type == 'sort') {
 				if (preg_match('/=/', $args[0])) {
 					$f = array_shift($args);
@@ -487,6 +485,15 @@ class Book extends Model {
 					$f = explode('=', $f);
 					$this->db->order_by($f[0], $f[1]);
 					$this->db->select($f[0]);
+				}
+			}
+			if ($type == 'user') {
+				if ($args[0] == -1) {
+					array_shift($args);
+				} else {
+					if (preg_match('/[0-9]/', $args[0])) {
+						$this->db->where('metadata.user_id', array_shift($args));
+					}
 				}
 			}
 			if ($type == 'filter') {
@@ -498,6 +505,11 @@ class Book extends Model {
 			if ($type == 'page') {
 				if (preg_match('/[0-9]/', $args[0])) {
 					$page = array_shift($args);
+				}
+			}
+			if ($type == 'perpage') {
+				if (preg_match('/[0-9]/', $args[0])) {
+					$perpage = array_shift($args);
 				}
 			}
 		}
@@ -645,7 +657,8 @@ class Book extends Model {
 				'page_id'   => $page,
 				'fieldname' => strtolower($name),
 				'counter'   => $counter,
-				((strlen($value) > 1000) ? 'value_large' : 'value') => $value
+				((strlen($value) > 1000) ? 'value_large' : 'value') => $value,
+				'user_id'   => $this->session->userdata('id')
 			);
 
 			$this->db->insert('metadata', $data);
