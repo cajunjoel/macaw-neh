@@ -64,8 +64,16 @@
 					echo(($permissions[$p] ? ' checked' : ''));
 					if (!$is_admin && !$is_local_admin || ($p == 'admin' && !$is_admin)) { 
 						echo(' disabled'); 
-					} 
-					echo("> $p&nbsp;&nbsp;&nbsp;&nbsp;");
+					}
+					if ($p == 'scan') {
+						echo("> Edit Metadata &nbsp;&nbsp;&nbsp;&nbsp;");
+					} elseif ($p == 'local_admin') {
+						echo("> Local Admin&nbsp;&nbsp;&nbsp;&nbsp;");
+					} elseif ($p == 'admin') {
+						echo("> Admin&nbsp;&nbsp;&nbsp;&nbsp;");
+					} else {
+						echo("> $p&nbsp;&nbsp;&nbsp;&nbsp;");
+					}
 				}
 			?>
 		</td>

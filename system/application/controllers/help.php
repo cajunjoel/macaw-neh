@@ -68,4 +68,8 @@ class Help extends Controller {
 		$this->load->view('help/neh_view');
 	}
 
+	function neh_examples() {
+		$this->load->view('help/neh_examples_view');
+	}
+
 }
