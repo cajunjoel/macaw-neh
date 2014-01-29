@@ -679,6 +679,9 @@ td.yui-dt-last {
 }
 /* Main Pages additions
 /* In Progress Page */
+#userqueues.fulltable{
+	width:95%;
+}
 .fulltable{
 	width:940px;
 	margin: 0px auto

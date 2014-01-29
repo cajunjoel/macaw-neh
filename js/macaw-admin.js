@@ -206,6 +206,7 @@
 			MessageBox.init();
 
 		},
+		
 		updateData: function() {
 			val = Dom.get('queue-filter').value;
 			
@@ -219,7 +220,29 @@
 				argument: state 
 			}); 
 		},
+		
 		loadTables: function(data) {
+
+			var formatStatus = function(elCell, oRecord, oColumn, oData) {
+				if (oData == 'scanned' || oData == 'scanning' || oData == 'new') {
+					elCell.innerHTML = '<span style="color: #903">New</span>';				
+
+				} else if (oData == 'reviewing') {
+					elCell.innerHTML = '<span style="color: #F60"">In&nbsp;Progress</span>';
+
+				} else if (oData == 'reviewed') {
+					elCell.innerHTML = '<span style="color: #360">Finished</span>';
+
+				} else if (oData == 'uploading') {
+					elCell.innerHTML = '<span style="color: #360">Uploading</span>';
+
+				} else if (oData == 'completed') {
+					elCell.innerHTML = '<span style="color: #360">Completed</span>';
+
+				} else {
+					elCell.innerHTML = oData;
+				}
+			}
 				
 			YAHOO.widget.DataTable.formatLink = function(elLiner, oRecord, oColumn, oData) { 
 				var barcode = YAHOO.lang.escapeHTML(oData); 
@@ -230,13 +253,15 @@
 				{key:"barcode",			label:'Barcode',			formatter:YAHOO.widget.DataTable.formatLink,	sortable: true },
 				{key:"title",				label:'Title',				sortable: true },
 				{key:"author",			label:'Author',				sortable: true },
-				{key:"org_name",		label:'Organization',	sortable: true },
-				{key:"status_code",	label:'Status',				sortable: true }
+				{key:"volume",			label:'Vol.',					sortable: true },
+				{key:"user",				label:'User',					sortable: true },
+// 				{key:"org_name",		label:'Org.',					sortable: true },
+				{key:"status_code",	label:'Status',				formatter: formatStatus,  sortable: true }
 			];
 
 			ListItems.dataSource = new YAHOO.util.DataSource(data.in_progress);
 			ListItems.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-			ListItems.dataSource.responseSchema = {	fields: ["barcode","title","author","org_name","status_code"] };
+			ListItems.dataSource.responseSchema = {	fields: ["barcode","title","author","volume", "user", "org_name","status_code"] };
 			ListItems.dataSource.doBeforeCallback = function (req, raw, res, cb) {
 				// This is the filter function
 				var data = res.results || [], filtered = [], i ,l;
@@ -248,16 +273,16 @@
 							filtered.push(data[i]);
 
 						} else if (req == 'new') {
-							if (data[i].status_code == 'new') {
+							if (data[i].status_code == 'scanning' || data[i].status_code == 'scanned' || data[i].status_code == 'new') {
 								filtered.push(data[i]);
 							}						
 
 						} else if (req == 'in progress') {
-							if (data[i].status_code == 'scanning' || data[i].status_code == 'scanned' || data[i].status_code == 'reviewing') {
+							if (data[i].status_code == 'reviewing') {
 								filtered.push(data[i]);
 							}						
 
-						} else if (req == 'completed') {
+						} else if (req == 'completed' || req == 'exporting' || req == 'exported' || req == 'completed' ) {
 							if (data[i].status_code == 'reviewed') {
 								filtered.push(data[i]);
 							}						

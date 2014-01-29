@@ -39,6 +39,7 @@ class Book extends Model {
 	 */
 	public $id = '';
 	public $org_id = '';
+	public $user_id = '';
 	public $barcode = '';
 	public $status  = '';
 	public $pages_found = '';
@@ -94,6 +95,7 @@ class Book extends Model {
 				$this->status        = $row->status_code;
 				$this->id            = $row->id;
 				$this->org_id        = $row->org_id;
+				$this->user_id        = $row->user_id;
 				$this->org_name      = $row->org_name;
 				$this->pages_found   = $row->pages_found;
 				$this->pages_scanned = $row->pages_scanned;
@@ -880,7 +882,9 @@ class Book extends Model {
 			$select .= ", max(item.pages_scanned) as pages_scanned";
 			$select .= ", max(item.scan_time) as scan_time";
 			$select .= ", max(item.org_id) as org_id";
+			$select .= ", max(item.user_id) as user_id";
 			$select .= ", max(organization.name) as org_name";
+			$select .= ", max(account.username) as user";
 			$select .= ", max(item.date_created) as date_created";
 			$select .= ", max(item.date_scanning_start) as date_scanning_start";
 			$select .= ", max(item.date_scanning_end) as date_scanning_end";
@@ -897,6 +901,7 @@ class Book extends Model {
 			$group = array();
 			// Dynamically build the query and the joins for all of the metadata fields in the configration
 			// I fully expect this to slow way down when we have thousands of books in the system.
+			$this->db->join('account','account.id = item.user_id');
 			$this->db->join('organization','organization.id = item.org_id');
 			if ($org_id > 0) {
 				$this->db->where('item.org_id', $org_id);
@@ -924,6 +929,7 @@ class Book extends Model {
 			$this->db->group_by('item.id');
 			$this->db->order_by($order_by);
 			$query = $this->db->get();
+// 			print_r($this->db->last_query());
 			
 			return $query->result();
 		} else {
@@ -1089,13 +1095,14 @@ class Book extends Model {
 			'pages_found' => $this->pages_found,
 			'pages_scanned' => $this->pages_scanned,
 			'scan_time' => $this->scan_time,
-			'needs_qa' => ($this->needs_qa ? 't' : 'f')
+			'needs_qa' => ($this->needs_qa ? 't' : 'f'),
+			'user_id' => $this->session->userdata('id')
 		);
 		// Just in case, let's reset the org_id if it's empty. 
 		if (!$this->org_id) {
 			$data['org_id'] = $this->CI->user->org_id;
 		}
-
+		
 		$this->db->where('id', $this->id);
 		$this->db->update('item', $data);
 
