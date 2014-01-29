@@ -23,6 +23,7 @@ plugins/metadata/*
 !plugins/metadata/Generic.php
 !plugins/metadata/Standard_Metadata.js
 !plugins/metadata/Standard_Metadata.php
+system/application/logs
 
 ########################################
 # DATA DIRECTORIES
