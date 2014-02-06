@@ -901,7 +901,7 @@ class Book extends Model {
 			$group = array();
 			// Dynamically build the query and the joins for all of the metadata fields in the configration
 			// I fully expect this to slow way down when we have thousands of books in the system.
-			$this->db->join('account','account.id = item.user_id');
+			$this->db->join('account','account.id = item.user_id', 'left outer');
 			$this->db->join('organization','organization.id = item.org_id');
 			if ($org_id > 0) {
 				$this->db->where('item.org_id', $org_id);

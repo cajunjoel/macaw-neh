@@ -85,6 +85,7 @@ class Admin extends Controller {
 		$data = array(
 			'new_items' => array(),
 			'in_progress' => array(),
+			'finished' => array(),
 			'exporting' => array(),
 			'completed' => array(),
 			'error' => array()
@@ -102,11 +103,14 @@ class Admin extends Controller {
 
 		// Sort our records into the subarrays
 		foreach ($books as $b) {
-			if ($b->status_code == 'new') {
+			if ($b->status_code == 'new' || $b->status_code == 'scanning' || $b->status_code == 'scanned') {
 				array_push($data['new_items'], $b);
 
-			} elseif ($b->status_code == 'scanning' || $b->status_code == 'scanned' || $b->status_code == 'reviewing' || $b->status_code == 'reviewed') {
+			} elseif ($b->status_code == 'reviewing') {
 				array_push($data['in_progress'], $b);
+
+			} elseif ($b->status_code == 'reviewed') {
+				array_push($data['finished'], $b);
 
 			} elseif ($b->status_code == 'exporting') {
 				array_push($data['exporting'], $b);
