@@ -127,7 +127,7 @@ Download the most recent .zip file:
 
 Or as a shortcut:
 
-	$ curl -O -L https://github.com/cajunjoel/macaw-neh/archive/master.zip && unzip -q master.zip && cd macaw-neh-master && sudo cp -r * /var/www/.
+	$ curl -O -L https://github.com/cajunjoel/macaw-neh/archive/master.zip && unzip -oq master.zip && cd macaw-neh-master && cp -r * /var/www/. && cd ..
 
 As a reminder, Macaw does not deliver the "incoming" or "books" directories nor does it deliver
 the config.php, macaw.php, or database.php files, therefore the recursive copy is non-destructive.
