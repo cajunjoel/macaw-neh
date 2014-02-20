@@ -194,7 +194,11 @@ class Main extends Controller {
 			} else {
 				// Set the barcode and other info in the session
 				$this->session->set_userdata('barcode', $this->book->barcode);
-				$this->session->set_userdata('title', $this->book->get_metadata('title'));
+				$title = $this->book->get_metadata('title');
+				if ($vol = $this->book->get_metadata('volume')) {
+					$title = $title.' / '.$vol;
+				}
+				$this->session->set_userdata('title', $title);
 				$this->session->set_userdata('author', $this->book->get_metadata('author'));
 	
 				// Redirect depending on status
@@ -231,6 +235,7 @@ class Main extends Controller {
 			// have a valid book when it was invalid. Reset the session variables.
 			$this->session->set_userdata('barcode', '');
 			$this->session->set_userdata('title', '');
+			$this->session->set_userdata('volume', '');
 			$this->session->set_userdata('author', '');
 
 			// Redirect to the main activities page
