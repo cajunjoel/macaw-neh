@@ -138,9 +138,7 @@ YAHOO.macaw.Metadata = function(parent, data, mdModules) {
 		}
 		results.filebase = this.filebase;
 		results.sequence = this.sequence;
-		if (this.parent.isVisible) {
-			results.thumbnail = this.parent.urlThumbnail;
-		}
+		results.thumbnail = this.parent.urlThumbnail;
 		// Return an object of name-value pairs. Values may be an array of similar items (i.e. Page Type)
 		return results;
 	}
