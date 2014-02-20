@@ -3,6 +3,7 @@
 	$cfg = $this->config->item('macaw');
 	$is_admin = $this->user->has_permission('admin') || $this->user->has_permission('local_admin');	
 	$can_edit_item = false;
+	$can_edit_metadata = $is_admin;
 	$barcode = $this->session->userdata('barcode');
 	if ($barcode) {
 		if ($this->book->exists($barcode)) {
@@ -55,14 +56,19 @@
 						<li><a href="/scan/monitor/"><img src="/images/03_import_pages_icon_sm.png">Import Pages</a></li>
 						<li><a href="/scan/review"><img src="/images/04_review_pages_icon_sm.png">Review Pages</a></li>
 						<li><a href="/scan/missing/insert"><img src="/images/05_insert_missing_pages_icon_sm.png">Insert Missing Pages</a></li>
-						<li><a href="/main/edit"><img src="/images/07_edit_items_icon_sm.png">Edit Item</a></li>						
 						<?php } else { ?>
 						<li class="disabled"><a href="#"><img src="/images/03_import_pages_icon_sm.png">Upload Pages</a></li>
 						<li class="disabled"><a href="#"><img src="/images/03_import_pages_icon_sm.png">Import Pages</a></li>
 						<li class="disabled"><a href="#"><img src="/images/04_review_pages_icon_sm.png">Review Pages</a></li>
 						<li class="disabled"><a href="#"><img src="/images/05_insert_missing_pages_icon_sm.png">Insert Missing Pages</a></li>
+						<?php } ?>
+
+						<?php if ($can_edit_metadata) { ?>
+						<li><a href="/main/edit"><img src="/images/07_edit_items_icon_sm.png">Edit Item</a></li>						
+						<?php } else { ?>
 						<li class="disabled"><a href="#"><img src="/images/07_edit_items_icon_sm.png">Edit Item</a></li>						
 						<?php } ?>
+
 						<?php if ($can_edit_item) { ?>
 						<li class="last"><a href="/scan/history"><img src="/images/06_view_history_icon_sm.png">View History</a></li>
 						<?php } else { ?>
