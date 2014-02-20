@@ -201,16 +201,25 @@ class Main extends Controller {
 				if ($this->book->status == 'new' || $this->book->status == 'scanning'){
 					redirect($this->config->item('base_url').'scan/monitor');
 	
-				} elseif ($this->book->status == 'scanned' || $this->book->status == 'reviewing'){
+				} elseif ($this->book->status == 'scanned' || $this->book->status == 'reviewing') {
 					redirect($this->config->item('base_url').'scan/review');
 	
-				} elseif ($this->book->status == 'reviewed' || $this->book->status == 'completed' || $this->book->status == 'exporting' || $this->book->status == 'archived'){			
-					if ($this->book->status == 'reviewed' && $this->user->has_permission('admin')) {
+				} elseif ($this->book->status == 'reviewed') {
+				
+					if ($this->user->has_permission('admin')) { // Admin can always reopen an item before it's exported
 						redirect($this->config->item('base_url').'scan/review');					
+
+					} elseif ($this->session->userdata('id') == $this->book->user_id) { // The last user to save the book gets to reopen it
+						redirect($this->config->item('base_url').'scan/review');					
+
 					} else {
 						$this->session->set_userdata('warning', 'This item can no longer be edited. You are seeing the item\'s history instead.');
 						redirect($this->config->item('base_url').'scan/history');
 					}
+										
+				} elseif ($this->book->status == 'completed' || $this->book->status == 'exporting' || $this->book->status == 'archived') {
+					$this->session->set_userdata('warning', 'This item can no longer be edited. You are seeing the item\'s history instead.');
+					redirect($this->config->item('base_url').'scan/history');
 										
 				} else {
 					redirect($this->config->item('base_url').'main');
