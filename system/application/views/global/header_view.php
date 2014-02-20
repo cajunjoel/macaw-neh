@@ -3,7 +3,6 @@
 	$cfg = $this->config->item('macaw');
 	$is_admin = $this->user->has_permission('admin') || $this->user->has_permission('local_admin');	
 	$can_edit_item = false;
-	$can_edit_metadata = $is_admin;
 	$barcode = $this->session->userdata('barcode');
 	if ($barcode) {
 		if ($this->book->exists($barcode)) {
@@ -42,6 +41,7 @@
 			<ul>
 				<li class="top"><a href="/dashboard">Dashboard</a></li>
 				<li class="top"><a href="/main/listitems">In Progress</a></li>
+				<?php if ($is_admin) { ?>
 				<li class="top"><a href="#create-new">Create New</a>
 					<ul>
 						<li><a href="/main/add"><img src="/images/01_manually_ad_icon_sm.png">Manually Add Item</a></li>
@@ -51,32 +51,14 @@
 				</li>
 				<li class="top"><a href="#manage">Current Item</a>
 					<ul>					
-						<?php if ($can_edit_item) { ?>
 						<li><a href="/scan/upload/"><img src="/images/icon-upload-small.png">Upload Files</a></li>
 						<li><a href="/scan/monitor/"><img src="/images/03_import_pages_icon_sm.png">Import Pages</a></li>
 						<li><a href="/scan/review"><img src="/images/04_review_pages_icon_sm.png">Review Pages</a></li>
 						<li><a href="/scan/missing/insert"><img src="/images/05_insert_missing_pages_icon_sm.png">Insert Missing Pages</a></li>
-						<?php } else { ?>
-						<li class="disabled"><a href="#"><img src="/images/03_import_pages_icon_sm.png">Upload Pages</a></li>
-						<li class="disabled"><a href="#"><img src="/images/03_import_pages_icon_sm.png">Import Pages</a></li>
-						<li class="disabled"><a href="#"><img src="/images/04_review_pages_icon_sm.png">Review Pages</a></li>
-						<li class="disabled"><a href="#"><img src="/images/05_insert_missing_pages_icon_sm.png">Insert Missing Pages</a></li>
-						<?php } ?>
-
-						<?php if ($can_edit_metadata) { ?>
 						<li><a href="/main/edit"><img src="/images/07_edit_items_icon_sm.png">Edit Item</a></li>						
-						<?php } else { ?>
-						<li class="disabled"><a href="#"><img src="/images/07_edit_items_icon_sm.png">Edit Item</a></li>						
-						<?php } ?>
-
-						<?php if ($can_edit_item) { ?>
 						<li class="last"><a href="/scan/history"><img src="/images/06_view_history_icon_sm.png">View History</a></li>
-						<?php } else { ?>
-						<li class="last disabled"><a href="#"><img src="/images/06_view_history_icon_sm.png">View History</a></li>
-						<?php } ?>
 					</ul>
 				</li>
-				<?php if ($is_admin) { ?>
 				<li class="top"><a href="#admin">Admin</a>
 					<ul>
 						<li><a href="/scan/review/all"><img src="/images/05_insert_missing_pages_icon_sm.png">View All Page Images</a></li>
