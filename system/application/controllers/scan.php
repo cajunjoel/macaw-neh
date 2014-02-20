@@ -504,13 +504,6 @@ class Scan extends Controller {
 				$this->logging->log('error', 'debug', 'Error in review() '. $e->getMessage());
 				redirect($this->config->item('base_url').'main');
 			} // try-catch
-				
-			// If not, lock it.
-			$this->book->set_metadata('locked-by', $this->session->userdata('username'));
-			$this->book->set_metadata('locked-on', date('Y-m-d H:i:s T'));
-			$this->book->update();
-			
-			$this->book->set_status('reviewing', $this->user->has_permission('admin'));
 		} 
 		
 		$data = array();
@@ -749,6 +742,12 @@ class Scan extends Controller {
 			}
 
 		} // foreach ($data->pages as $p)
+
+		// If not, lock it.
+		$this->book->set_metadata('locked-by', $this->session->userdata('username'));
+		$this->book->set_metadata('locked-on', date('Y-m-d H:i:s T'));
+		$this->book->set_status('reviewing', $this->user->has_permission('admin'));
+
 		$this->book->set_metadata('last-saved-on', date('Y-m-d H:i:s T'));
 		$this->book->update();
 
