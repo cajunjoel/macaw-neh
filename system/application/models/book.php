@@ -1378,24 +1378,30 @@ class Book extends Model {
 
 		$q = $this->db->query(
 			"select 
+			   (select count(*) from metadata where fieldname = 'neh_type_p' and value = 'Photograph') as type_photos,
+			   (select count(*) from metadata where fieldname = 'neh_type_i' and value = 'Illustration') as type_illustration,
+			   (select count(*) from metadata where fieldname = 'neh_type_d' and value = 'Diagram/Chart') as type_diagram,
+			   (select count(*) from metadata where fieldname = 'neh_type_l' and value = 'Bookplate') as type_bookplate,
+			   (select count(*) from metadata where fieldname = 'neh_type_m' and value = 'Map') as type_map,
 			   (select count(*) from item) as books,
 			   (select count(*) from page) as pages,
-			   (select count(*) from item where status_code = 'completed') as completed
+			   (select count(*) from item where status_code in ('reviewed','exported','exporting','completed')) as completed,
+			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exported','exporting','completed'))) as completed_pages
 			   ;"
 		);
 		$r = $q->row();
 		
-		$data->type_photo = 0;
-		$data->type_drawing = 0;
-		$data->type_print = 0;
-		$data->type_diagram = 0;
-		$data->type_map = 0;
+		$data->type_photo = $r->type_photos;
+		$data->type_drawing = $r->type_illustration;
+		$data->type_print = $r->type_diagram;
+		$data->type_diagram = $r->type_bookplate;
+		$data->type_map = $r->type_map;
 
 		$data->completed = $r->completed;
 		$data->total_items = $r->books;
 		$data->total_pages = $r->pages;
-		$data->pct_complete = 0;
-		$data->pages_per_day = 0;
+		$data->pct_complete = round($r->completed / $r->books * 100,1);
+		$data->pages_complete = $r->completed_pages;
 	
 		return $data;
 	}

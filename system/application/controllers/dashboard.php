@@ -133,10 +133,10 @@ class Dashboard extends Controller {
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_print.' Prints<br>'.
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Diagrams<br>'. 
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_map.' Maps<br>'.
- 										$row->completed.' items completed<br>'.
  										$row->total_items.' total items / '.
  										$row->total_pages.' total pages<br>'.
- 										$row->pages_per_day.' pages completed per day<br>'.
+ 										$row->completed.' completed items / '.
+ 										$row->pages_complete.' completed pages<br>'.
  										$row->pct_complete.'% complete overall'.
  										'</div>';
 		$data['column'] = '1';
