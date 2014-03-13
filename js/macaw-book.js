@@ -558,7 +558,7 @@ YAHOO.macaw.Book = function() {
 	// ----------------------------
 	this._initDataTable = function() {
 		var formatThumb = function(elCell, oRecord, oColumn, oData) {
-			elCell.innerHTML = '<img src="'+oData+'" height="24" border="0">';
+			elCell.innerHTML = '<img src="'+oData+'" height="35" border="0">';
 		}
 		var myData = {pages: []};
 		var myColumnDefs = [
