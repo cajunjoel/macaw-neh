@@ -13,7 +13,7 @@
 	<div id="login_details">
 		<a href="#" onClick="User.edit('');"><? echo $this->session->userdata('full_name') ?></a> |
 		<a href="<? echo $this->config->item('base_url'); ?>login/logout">Logout</a> |
-		<a href="#" onClick="General.openHelp();void(0);">Help</a>
+		<a href="#" onClick="General.openHelpNEH();void(0);">Help</a>
 	</div>
 
 	<div class="clear"><!-- --></div>

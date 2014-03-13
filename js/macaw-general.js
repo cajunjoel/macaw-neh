@@ -275,9 +275,19 @@
 		// Return Value / Effect
 		//    Popup window appears
 		// ----------------------------
+
 		openHelp: function() {
-			window.open(sBaseUrl+'/help','help_window','height=700,width=300,status=no,location=no,menubar=no,resizable=yes,toolbar=no');
+			window.open(sBaseUrl+'/help','help_window','height=700,width=300,status=no,location=no,menubar=no,resizable=yes,toolbar=no').focus();
 		},
+
+		openHelpNEH: function() {
+			window.open(sBaseUrl+'/help/neh','help_window','height=700,width=300,status=no,location=no,menubar=no,resizable=yes,toolbar=no').focus();
+		},
+		
+		openHelpNEHExamples: function() {
+			window.open(sBaseUrl+'/help/neh_examples','help_window','height=700,width=400,status=no,location=no,menubar=no,resizable=yes,toolbar=no').focus();
+		},
+			
 
 		// ----------------------------
 		// Function: showMagnifier()
