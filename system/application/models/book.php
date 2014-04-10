@@ -505,6 +505,7 @@ class Book extends Model {
 			if ($type == 'filter') {
 				if (preg_match('/=/', $args[0])) {
 					$f = explode('=', array_shift($args));
+					if ($f[1] == 'Diagram-Chart') { $f[1] = 'Diagram/Chart'; }
 					$this->db->or_where('("fieldname" = \''.$f[0].'\' and "value" = \''.$f[1].'\')');
 				}				
 			}
