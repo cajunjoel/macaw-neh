@@ -1392,9 +1392,9 @@ class Book extends Model {
 		$r = $q->row();
 		
 		$data->type_photo = $r->type_photos;
-		$data->type_drawing = $r->type_illustration;
-		$data->type_print = $r->type_diagram;
-		$data->type_diagram = $r->type_bookplate;
+		$data->type_illustration = $r->type_illustration;
+		$data->type_diagram = $r->type_diagram;
+		$data->type_bookplate = $r->type_bookplate;
 		$data->type_map = $r->type_map;
 
 		$data->completed = $r->completed;
