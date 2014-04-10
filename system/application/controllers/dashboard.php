@@ -129,8 +129,8 @@ class Dashboard extends Controller {
  		$data['html'] = '<div id="summary-widget">'.
  										'Image Types identified:<br>'.
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_illustration.' Illustrations<br>'.
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Diagrams/Charts<br>'. 
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_photo.' Photographs<br>'.
+										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Diagrams/Charts<br>'. 
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_map.' Maps<br>'.
 										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_bookplate.' Bookplates<br>'.
  										$row->total_items.' total items / '.
