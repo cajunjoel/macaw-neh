@@ -1386,8 +1386,10 @@ class Book extends Model {
 			   (select count(*) from metadata where fieldname = 'neh_type_m' and value = 'Map') as type_map,
 			   (select count(*) from item) as books,
 			   (select count(*) from page) as pages,
-			   (select count(*) from item where status_code in ('reviewed','exported','exporting','completed')) as completed,
-			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exported','exporting','completed'))) as completed_pages
+			   (select count(*) from item where status_code in ('reviewed','exporting')) as completed,
+			   (select count(*) from item where status_code in ('exported','completed')) as exported,
+			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exporting'))) as completed_pages,
+			   (select count(*) from page where item_id in (select id from item where status_code in ('exported','completed'))) as exported_pages
 			   ;"
 		);
 		$r = $q->row();
@@ -1399,10 +1401,12 @@ class Book extends Model {
 		$data->type_map = $r->type_map;
 
 		$data->completed = $r->completed;
+		$data->exported = $r->exported;
 		$data->total_items = $r->books;
 		$data->total_pages = $r->pages;
-		$data->pct_complete = round($r->completed / $r->books * 100,1);
+		$data->pct_complete = round($r->completed_pages / $r->pages * 100, 1);
 		$data->pages_complete = $r->completed_pages;
+		$data->pages_exported = $r->exported_pages;
 	
 		return $data;
 	}
