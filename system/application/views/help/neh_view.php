@@ -27,7 +27,7 @@
 
 	Unselecting a checkbox will remove that value from the selected page(s). To clear the selection from multiple pages, select the pages, check the checkbox, then <strong>uncheck</strong> the checkbox to clear the setting. Once color or black/white have been set, they can't be cleared.<br><br>
 
-	<a href="/help/neh_examples" target="_blank">View some examples</a> of the different page types to help you decide what selections you should be making.
+	<a href="/images/Macaw-Art-of-Life-Help.pdf" target="_blank">View some examples</a> of the different page types to help you decide what selections you should be making.
 	
 	<h3 style="color:#4F7E97">No Images</h3>
 	
