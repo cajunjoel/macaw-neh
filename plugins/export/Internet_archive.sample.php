@@ -1526,8 +1526,8 @@ class Internet_archive extends Controller {
 	function _create_marc_xml() {
 		// Just get the MARC XML from the book and format the XML file properly
 		$marc = $this->CI->book->get_metadata('marc_xml');
-		if (!preg_match("/<\?xml.*?>/is", $marc)) {
-			return '<?xml version="1.0" encoding="UTF-8" ?'.'>'."\n".$marc;
+		if (!preg_match("/<\?xml.*?\>/is", $marc)) {
+			return '<'.'?xml version="1.0" encoding="UTF-8" ?'.'>'."\n".$marc;
 		} else {
 			return $marc;
 		}
