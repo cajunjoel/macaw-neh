@@ -253,7 +253,6 @@ class NEH extends Controller {
 		$this->CI->book->set_page_metadata($page_id, 'pageid', $page['pageid']);
 		$this->CI->book->set_page_metadata($page_id, 'abbyy_hasillustration', $page['abbyy_hasillustration']);
 		$this->CI->book->set_page_metadata($page_id, 'contrast_hasillustration', $page['contrast_hasillustration']);
-//		$this->CI->book->set_page_metadata($page_id, 'pixel_depth', $page['pixel_depth']);
 		$this->CI->book->set_page_metadata($page_id, 'percent_coverage', $page['percent_coverage']);
 		$this->CI->book->set_page_metadata($page_id, 'illustrations', serialize($page['illustrations']));
 
@@ -379,53 +378,3 @@ class NEH extends Controller {
 		}
 	}
 }
-
-//			SAMPLE JSON OBJECT 
-//
-// 			Array
-// 			(
-// 					[_id] => 503f82e09bb1100702b06083
-// 					[has_illustration] => Array
-// 							(
-// 									[gold_standard] => 
-// 									[contrast] => 
-// 							)
-// 			
-// 					[scan_id] => mobot31753002245303
-// 					[bytes_per_pixel] => 0.11434681054746
-// 					[compression] => 0.11434681054746
-// 					[page_num] => 93
-// 					[abbyy] => Array
-// 							(
-// 									[coverage_max] => 0
-// 									[picture_blocks] => Array
-// 											(
-// 											)
-// 			
-// 									[height] => 3027
-// 									[total_coverage_sum] => 79
-// 									[width] => 1878
-// 							)
-// 			
-// 					[pixel_depth] => 8
-// 					[benchmarks] => Array
-// 							(
-// 									[contrast] => Array
-// 											(
-// 													[total] => 0.095317
-// 											)
-// 			
-// 							)
-// 			
-// 					[file_size] => 650028
-// 					[ia_page_num] => 92
-// 					[scandata_index] => 92
-// 					[contrast] => Array
-// 							(
-// 									[total_time] => 0.91763800000001
-// 									[1d_time] => 0.0016839999999547
-// 									[image_detected] => 
-// 									[max_contiguous] => 0.014
-// 							)
-// 			
-// 			)
