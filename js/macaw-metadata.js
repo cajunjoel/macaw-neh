@@ -144,6 +144,35 @@ YAHOO.macaw.Metadata = function(parent, data, mdModules) {
 	}
 
 	// ----------------------------
+	// Function: getFriendlyData()
+	//
+	// Get the data for this one page from all of the metadata modules to be placed into the
+	// data table (list view). This may look the same as the getSaveData() function, but it's not.
+	// Also makes sure that the return object contains the filebase, sequence and thumbnail URL.
+	//
+	// Arguments
+	//    None
+	//
+	// Return Value / Effect
+	//    Object (associative array) of data.
+	// ----------------------------
+	this.getFriendlyData = function() {
+		var results = '';
+		
+		// Cycle through all of the metadata modules
+		fb = this.filebase;
+		str = fb.replace(/http:\/\/archive.org\/download\/(.*?)\/page\/.+/, "$1");
+		results = results + "<strong>IA Identifier:</strong> " + str + '<br>';
+		results = results + "<strong>Sequence #:</strong> " + this.sequence + '<br>';
+
+		for (var m in this.modules) {
+			results = results + this.modules[m].getFriendlyData() + '<br>';
+		}
+		// Return an object of name-value pairs. Values may be an array of similar items (i.e. Page Type)
+		return results;
+	}
+
+	// ----------------------------
 	// Function: getTableColumns()
 	//
 	// Get the descriptors from the individual metadata modules. If the module does not

@@ -306,10 +306,15 @@ YAHOO.macaw.Book = function() {
 			this._renderDataTable();
 		}
 	
-		listItems = ['Delete Page'];
+		if (this.contextMenu) {
+			this.contextMenu.destroy();
+		} 
+		
+		listItems = [];
 		if (showAllImages == 1) {
-			listItems = ['Delete Page', 'Edit Item'];
+			listItems = ['Edit Item','View Details'];
 		}
+
 		// Create the popup menu, later we'll associate it to the thumbnail images
 		this.contextMenu = new YAHOO.widget.ContextMenu(
 			'pagecontextmenu', {
@@ -325,10 +330,10 @@ YAHOO.macaw.Book = function() {
 				oLI = oTarget.nodeName.toUpperCase() == "LI" ? oTarget : YAHOO.util.Dom.getAncestorByTagName(oTarget, "LI");
 				switch (oItem.index) {
 					case 0: 
-						oBook.deletePage(oLI.id);
+						oBook.editItem(oLI.id);
 						break;
 					case 1: 
-						oBook.editItem(oLI.id);
+						oBook.viewDetails(oLI.id);
 						break;
 				}
 			}		
@@ -391,6 +396,15 @@ YAHOO.macaw.Book = function() {
 		General.showYesNo('Are you sure you want to delete this page? This cannot be undone.', doDelete);
 		
 	}
+
+	this.viewDetails = function(LIid) {
+
+		// Get the index into the array of the page we are deleting
+		idx = oBook.pages.find('id', LIid);
+		General.showMessage(oBook.pages.pages[idx].metadata.getFriendlyData());
+		
+	}
+
 
 	this.editItem  = function(LIid) {
 		// Get the index into the array of the page we are deleting
