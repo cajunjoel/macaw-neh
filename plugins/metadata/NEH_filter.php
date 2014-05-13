@@ -20,8 +20,8 @@
 			<td valign="top" style="width: 130px;color: black">
 				<br>
 				Color Depth:<br>
-				<input id="color_1" type="checkbox" name="color" value="Color" onChange="YAHOO.macaw.NEH_filter.filterPages();"> Color<br>
-				<input id="color_2" type="checkbox" name="monochrome" value="Black/White" onChange="YAHOO.macaw.NEH_filter.filterPages();"> Monochrome<br><br>
+				<input id="neh_color_c" type="checkbox" name="neh_color" value="Color" onChange="YAHOO.macaw.NEH_filter.filterPages();"> Color<br>
+				<input id="neh_color_bw" type="checkbox" name="neh_color" value="Black-White" onChange="YAHOO.macaw.NEH_filter.filterPages();"> Monochrome<br><br>
 <!-- 
 				Page Coverage: <span id="size-val">0%</span>
 				<div id="slider-bg" class="yui-h-slider" tabindex="-1" title="Slider">
@@ -37,7 +37,9 @@
 					<? foreach ($users as $u) { ?>
 					<option value="<? echo $u->id ?>"><? echo $u->full_name ?></option>
 					<? } ?>
-				</select>
+				</select><br><br>
+				Images: <br>
+				<input id="no_images" type="checkbox" name="no_images" value="1" onChange="YAHOO.macaw.NEH_filter.filterPages();"> No Images Indicated<br>
 			</td>
 			<td valign="top" style="text-align: left;color: black">
 				<strong>Sort by:</strong> <br>

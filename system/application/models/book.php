@@ -309,7 +309,7 @@ class Book extends Model {
 				}
 				break;
 			case 'reviewed':
-				if ($status != 'reviewing' && !$this->CI->user->has_permission('admin')) {
+				if ($status != 'reviewing' && $status != 'exported' && $status != 'exporting' && !$this->CI->user->has_permission('admin')) {
 					$this->last_error = 'Only admins can set status to "'.$status.'" when item has status "reviewed".';
 					throw new Exception($this->last_error);				
 
@@ -325,7 +325,7 @@ class Book extends Model {
 				}
 				break;
 			case 'completed':
-				if ($status != 'archived' && $status != 'error') {
+				if ($status != 'archived' && $status != 'completed' && $status != 'error') {
 					$this->last_error = 'Cannot set status to "'.$status.'" when item has status "completed".';
 					throw new Exception($this->last_error);
 				}
@@ -506,6 +506,7 @@ class Book extends Model {
 				if (preg_match('/=/', $args[0])) {
 					$f = explode('=', array_shift($args));
 					if ($f[1] == 'Diagram-Chart') { $f[1] = 'Diagram/Chart'; }
+					if ($f[1] == 'Black-White') { $f[1] = 'Black/White'; }
 					$this->db->or_where('("fieldname" = \''.$f[0].'\' and "value" = \''.$f[1].'\')');
 				}				
 			}
@@ -632,7 +633,7 @@ class Book extends Model {
 			'delete from metadata
 			where item_id = '.$this->book->id.'
 			and page_id = '.$this->db->escape($page_id).'
-			and page_id is not null'
+			and page_id is not null and fieldname in (\'neh_type_i\',\'neh_type_d\',\'neh_type_m\',\'neh_type_p\',\'neh_type_l\',\'neh_color\',\'no_images\')'
 		);
 	}
 
@@ -1091,14 +1092,21 @@ class Book extends Model {
 	 * @since Version 1.3
 	 */
 	function update() {
-		// Update the ITEM table
+	
+		// Update the ITEM table		
 		$data = array(
 			'pages_found' => $this->pages_found,
 			'pages_scanned' => $this->pages_scanned,
 			'scan_time' => $this->scan_time,
-			'needs_qa' => ($this->needs_qa ? 't' : 'f'),
-			'user_id' => $this->session->userdata('id')
+			'needs_qa' => ($this->needs_qa ? 't' : 'f')
 		);
+
+		// Make it so admin doesn't "take" ownership from someone else
+		$this->CI->user->load(null, $this->session->userdata('id'));
+		if (!$this->CI->user->has_permission('admin') || !isset($this->user_id)) {
+			$data['user_id'] = $this->session->userdata('id');
+		}
+
 		// Just in case, let's reset the org_id if it's empty. 
 		if (!$this->org_id) {
 			$data['org_id'] = $this->CI->user->org_id;

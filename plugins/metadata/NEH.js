@@ -37,10 +37,10 @@ YAHOO.macaw.NEH = function(parent, data) {
 		{ id: 'neh_color', display_name: 'Color', type: 'radio'},
 		{ id: 'no_images', display_name: 'No Img?', type: 'checkbox'},
 // 		{ id: 'pageid', display_name: 'pageid', type: 'hidden'},
-		{ id: 'abbyy_hasillustration', display_name: 'ABBYY', type: 'hidden'},
-		{ id: 'contrast_hasillustration', display_name: 'Contrast', type: 'hidden'},
+//		{ id: 'abbyy_hasillustration', display_name: 'ABBYY', type: 'hidden'},
+//		{ id: 'contrast_hasillustration', display_name: 'Contrast', type: 'hidden'},
 //		{ id: 'pixel_depth', display_name: 'pixel_depth', type: 'hidden'},
-		{ id: 'percent_coverage', display_name: 'percent_coverage', type: 'hidden'}
+//		{ id: 'percent_coverage', display_name: 'percent_coverage', type: 'hidden'}
 // 		{ id: 'illustrations', display_name: 'illustrations', type: 'hidden'}
 	];
 

@@ -48,22 +48,32 @@ class User extends Model {
 	 *
 	 * @since Version 1.0
 	 */
-	function load($username = '') {
+	function load($username = '', $user_id = 0) {
 		// Initialize us
 		$this->_unload();
 
 		// Did we get a username? If so, we can load the data.
-		if ($username != '') {
+		if ($username != '' || $user_id != '') {
 
 			$this->db->select('account.*, organization.name as org_name');
 			$this->db->join('organization', 'account.org_id = organization.id', 'left');
-			$this->db->where('username', $username);
+
+			if ($username != '') {
+				$this->db->where('username', $username);
+			} else {
+				$this->db->where('account.id', $user_id);
+			}
+
 			$user = $this->db->get('account');
 
 			if ($user->num_rows() < 1) {
 				// No record, present an error
-				throw new Exception("The user \"$username\" could not be found.");
-
+				if ($username != '') {
+					throw new Exception("The user \"$username\" could not be found.");
+				} else {
+					throw new Exception("The user with ID \"$user_id\" could not be found or user ID not supplied.");
+				}
+	
 			} else {
 				// Yes, get the record and assign the info to our properties.
 				// NOTE: The created, modified, etc can be set, but they are not

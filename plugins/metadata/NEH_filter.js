@@ -29,7 +29,13 @@ YAHOO.macaw.NEH_filter = function(parent, data) {
 	// The "Type" specifier gives clues to render() and unrender() about
 	// how to handle different types of fields.
 	YAHOO.macaw.NEH_filter.metadataFields = [
-		{ id: 'neh_type', display_name: 'Type', type: 'select-one'},
+		{ id: 'neh_type_i', display_name: 'Illustration', type: 'checkbox'},
+		{ id: 'neh_type_d', display_name: 'Diagram', type: 'checkbox'},
+		{ id: 'neh_type_m', display_name: 'Map', type: 'checkbox'},
+		{ id: 'neh_type_p', display_name: 'Photograph', type: 'checkbox'},
+		{ id: 'neh_type_l', display_name: 'Bookplate', type: 'checkbox'},
+		{ id: 'neh_color', display_name: 'Color', type: 'radio'},
+		{ id: 'no_images', display_name: 'Images?', type: 'checkbox'},
 	];
 
 	/* ----------------------------
@@ -175,6 +181,27 @@ YAHOO.macaw.NEH_filter = function(parent, data) {
 
 		return data;
 	}
+
+
+	this.getFriendlyData = function() {
+		// This is almost the same as getData. If any field is something other than
+		// a text field, you may want to handle it differently. The data returned here
+		// will be converted to a string.
+		var data = '';
+
+		// Create a new object with only the data that we want to save
+		// We COULD send in the entire "this" object, but that's messy.
+		var fields = YAHOO.macaw.NEH_filter.metadataFields;
+		for (f in fields) {
+			if (fields[f].type != 'long-text') {
+				if (this[fields[f].id] != null) {
+					data = data + '<strong>' + fields[f].display_name + '</strong>: ' + this[fields[f].id] + '<br>';
+				}
+			}
+		}
+		return data;
+	}
+
 
 	/* ----------------------------
 	 * Function: render()
@@ -381,6 +408,18 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 	if (Dom.get('page_type_5').checked) {
 		values += '/filter/neh_type_l='+Dom.get('page_type_5').value
 	}
+
+	if (Dom.get('neh_color_c').checked) {
+		values += '/filter/neh_color='+Dom.get('neh_color_c').value
+	}
+	if (Dom.get('neh_color_bw').checked) {
+		values += '/filter/neh_color='+Dom.get('neh_color_bw').value
+	}
+
+	if (Dom.get('no_images').checked) {
+		values += '/filter/no_images=none'
+	}
+
 	values += '/sort/'+Dom.get('sort').value;
 	values += '/user/'+Dom.get('user').value;
 	values += '/perpage/'+Dom.get('perpage').value;
@@ -391,6 +430,7 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 	// Call the URL to get the data
 	// alert(sBaseUrl+'/scan/get_all_thumbnails'+values);
 	oBook.showSpinner(true);
+//	alert(sBaseUrl+'/scan/get_all_thumbnails'+values);
 	var transaction = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
 }
 
