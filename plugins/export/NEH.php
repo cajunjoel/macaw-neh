@@ -69,11 +69,12 @@ class NEH extends Controller {
 	function export($args) {
 		// 0. Output the header info for the JSON Output file 
 		
-		$fh = fopen('/tmp/macaw_neh_export.json', 'w');
+		$date = date('Ymd-his');
+		$fh = fopen('/tmp/macaw_neh_export-'.$date.'.json', 'w');
 		fwrite($fh, '{"items":[');
 
 		// 1. Get all items from the database	
- 		$books = $this->CI->book->get_all_books();
+ 		$books = $this->_get_books();
 		
 		$bk = array();
 		// 2. Loop through each item's pages 
@@ -104,22 +105,25 @@ class NEH extends Controller {
 
 				$pg['pageid'] = $p->pageid;				
 				$pg['sequence_order'] = (int)$p->sequence_number;
-//				if (isset($p->abbyy_hasillustration)) {
+				if (isset($p->abbyy_hasillustration)) {
 					$pg['abbyy_hasillustration'] = ($p->abbyy_hasillustration ? true : false);
-//				}
-//				if (isset($p->contrast_hasillustration)) {
+				} else {
+					$pg['abbyy_hasillustration'] = false; // HACK: This isn't be imported if it's false
+				}
+				if (isset($p->contrast_hasillustration)) {
 					$pg['contrast_hasillustration'] = ($p->contrast_hasillustration ? true : false);
-//				}
+				} else {
+					$pg['contrast_hasillustration'] = false;  // HACK: This isn't be imported if it's false
+				}
 
 				$pg['height'] = (int)$p->height;
 				$pg['width'] = (int)$p->width;
 				
-				if (isset($p->pixel_depth)) {
-					$pg['pixel_depth'] = (int)$p->pixel_depth;
-				}
+				$pg['percent_coverage'] = 0; // HACK: This isn't be imported if it's zero
 				if (isset($p->percent_coverage)) {
-					$pg['percent_coverage'] = round($p->percent_coverage,4);
+					$pg['percent_coverage'] = round($p->percent_coverage, 4);
 				}
+				
 				if (isset($p->illustrations)) {
 					$pg['illustrations'] = unserialize($p->illustrations);
 				}
@@ -153,6 +157,11 @@ class NEH extends Controller {
 			// 5. Export the structure to the JSON Output file
 			fwrite($fh, json_encode($bk));
 			print "Exported: ".$b->barcode."\n";
+			
+			// Mark the book as exported and complete
+			$this->CI->book->set_export_status('completed');
+			$this->CI->book->set_status('completed');
+			
 		}
 
 		// 6. Output the closing info for the JSON Output file
@@ -160,4 +169,32 @@ class NEH extends Controller {
 		fclose($fh);
 
 	}
+
+	// ----------------------------
+	// Function: _get_books()
+	//
+	// Parameters:
+	//    $status: The status of the items we are interested in
+	//
+	// Get those books that need to be uploaded by searching for those that are
+	// ready to be uploaded (item.status_code = 'reviewed') and have not yet been
+	// uploaded (item_export_status.status_code is blank or <whatever $status is>).
+	// ----------------------------
+	function _get_books() {
+		$query = $this->CI->db->query("select i.id from item i where i.status_code = 'reviewed';");
+		$ids = array();
+		if ($this->CI->db->count_all_results() > 0) {
+			foreach ($query->result() as $row) {
+				array_push($ids, $row->id);
+			}
+			if (count($ids)) {
+				$sql = 'select * from item where id in ('.implode($ids, ',').') order by date_review_end;';
+
+				$books = $this->CI->db->query($sql);
+				return $books->result();
+			}
+		}
+		return array();
+	}
+
 }
