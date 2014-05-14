@@ -1007,7 +1007,7 @@ class Book extends Model {
 				$this->last_error = "The barcode '".$info['barcode']."' already exists.";
 				throw new Exception($this->last_error);
 			} else {
-				if (strlen($info['barcode']) > 32) {
+				if (strlen($info['barcode']) > 128) {
 					$this->last_error = "The barcode is too long.";
 					throw new Exception($this->last_error);
 				}
