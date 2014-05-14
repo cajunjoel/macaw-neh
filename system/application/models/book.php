@@ -659,17 +659,26 @@ class Book extends Model {
 	 * @param interger [$counter] Default 1. Used when submitting more than one of the same metadata field.
 	 */
 	function set_page_metadata($page, $name, $value, $counter = 1) {
-		if (isset($value) && $value != '') {
-			$data = array(
-				'item_id'   => $this->id,
-				'page_id'   => $page,
-				'fieldname' => strtolower($name),
-				'counter'   => $counter,
-				((strlen($value) > 1000) ? 'value_large' : 'value') => $value,
-				'user_id'   => $this->session->userdata('id')
-			);
+		if (isset($value) && $value !== '') {
+			// If this doesn't exist, we can add it. See if it doesn't already exist
+			$this->CI->db->where('page_id', $page);
+			$this->CI->db->where('item_id', $this->id);
+			$this->CI->db->where('fieldname', strtolower($name));
+			$this->CI->db->where('counter', $counter);
+			$count = $this->CI->db->count_all_results('metadata');
 
-			$this->db->insert('metadata', $data);
+			if ($count == 0) {
+				$data = array(
+					'item_id'   => $this->id,
+					'page_id'   => $page,
+					'fieldname' => strtolower($name),
+					'counter'   => $counter,
+					((strlen($value) > 1000) ? 'value_large' : 'value') => $value,
+					'user_id'   => $this->session->userdata('id')
+				);
+				$this->db->insert('metadata', $data);			
+			}
+
 		}
 	}
 
