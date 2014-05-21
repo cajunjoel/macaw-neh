@@ -9,14 +9,14 @@
 <body class="yui-skin-sam" style="padding: 3em">
 	<h1 xxxxx">Macaw Art of Life Help: Image Examples</h1>
 	
-	<p style="text-align:center;font-weight:bold"><b>Examples of Illustration Class Types </b></p>
+	<p style="text-align:center;font-weight:bold"><b>Examples of Painting/Drawing/Diagram Class Types </b></p>
 	
-	<p style="text-align:left; margin-left: 30px;margin-right: 30px;">All pages should be classified as belonging to one or more image types:  Illustration, Diagram/Chart, Map, Photograph, and/or Book Plate.  If a page contains more than one type choose all the types that apply.  When indicating image type also indicate the color depth of the image - whether it is "b&w" or "color".  If uncertain choose "b&w" . If a page contains no image check the box that says "NO IMAGES ON THIS PAGE"  </p>
+	<p style="text-align:left; margin-left: 30px;margin-right: 30px;">All pages should be classified as belonging to one or more image types:  Painting/Drawing/Diagram, Chart/Table, Map, Photograph, and/or Book Plate.  If a page contains more than one type choose all the types that apply.  When indicating image type also indicate the color depth of the image - whether it is "b&w" or "color".  If uncertain choose "b&w" . If a page contains no image check the box that says "NO IMAGES ON THIS PAGE"  </p>
 	<p style="text-align:left; margin-left: 30px;margin-right: 30px;">Once pages are highlighted and image types, color depth or Misc applied the data will automatically be saved.  You can also click on "Save" if you are not sure if it saved.  You can do a review of your work by clicking on the List View and making sure there is data in the Type, Color, or No Img? Columns.</p>
 	<p style="text-align:left; margin-left: 30px;margin-right: 30px;">Once your classification is done click "Review Complete"  This will change its status to "Finished" on the In Progress page.  Otherwise its status will remain "In Progress"</p>
 
-	<h2 style="color:#4F7E97;margin-top:3em">Illustrations</h2>
-	<p>This will be the broadest class type. The majority of pages in the BHL will fall under this type. It will include drawings, paintings, prints, decorative letters, advertisements, etc. If there is every uncertainty as to which type a page should be assigned. The type of"illustration" should be the default. </p>
+	<h2 style="color:#4F7E97;margin-top:3em">Painting/Drawing/Diagram</h2>
+	<p>This will be the broadest class type. The majority of pages in the BHL will fall under this type. It will include drawings, paintings, prints, decorative letters, advertisements, etc. If there is every uncertainty as to which type a page should be assigned. The type of "Painting/Drawing/Diagram" should be the default. </p>
 	<table cellspacing="0" cellpadding="5" align="center">
 		<tr>
 			<td><a href="http://biodiversitylibrary.org/page/7220979" target="_blank"><img width=165 height=100 src="/images/examples/image002.png"></a></td>
@@ -26,8 +26,8 @@
 		</tr>
 	</table>
 
-	<h2 style="color:#4F7E97;margin-top:3em">Diagrams/Charts</h2>
-	<p>This type includes diagrams, charts, and tables. The data is usually laid out in a grid like pattern and will usually be accompanied by a description or caption beginning with the words"figs","table" </p>
+	<h2 style="color:#4F7E97;margin-top:3em">Chart/Table</h2>
+	<p>This type includes diagrams, charts, and tables. The data is usually laid out in a grid like pattern and will usually be accompanied by a description or caption beginning with the words "figs","table" </p>
 	<table cellspacing="0" cellpadding="5" align="center">
 		<tr>
 			<td><a href="http://biodiversitylibrary.org/page/41056131" target="_blank"><img border=0 width=111 height=161 src="/images/examples/image010.png"></a></td>
@@ -39,7 +39,7 @@
 	</table>
 
 	<h2 style="color:#4F7E97;margin-top:3em">Maps</h2>
-	<p>Maps are any illustration that conveys geographic information and will usually be accompanied by a description or caption beginning with the word"map" but could also include"figure" </p>
+	<p>Maps are any illustration that conveys geographic information and will usually be accompanied by a description or caption beginning with the word "map" but could also include "figure" </p>
 	<table cellspacing="0" cellpadding="5" align="center">
 		<tr>
 			<td width="25%" valign="top" style="text-align:center"><a href="http://biodiversitylibrary.org/page/41055982" target="_blank"><img border=0 width=110 height=156 src="/images/examples/image020.png"></a></td>
@@ -58,7 +58,7 @@
 		</tr>
 	</table>
 
-	<p><b>Photographs and illustrations should also be identified as being"b&amp;w" or"color" </b></p>
+	<p><b>Photographs and illustrations should also be identified as being "Black/White" or "Color" </b></p>
 	<p>If a page contains any amount of color, even if minimal, it should be assigned to color </p>
 	<table cellspacing="0" cellpadding="5" align="center">
 		<tr>
@@ -67,7 +67,7 @@
 		</tr>
 		<tr>
 			<td align="center">Color Illustration</td>
-			<td align="center">B&amp;W Illustration</td>
+			<td align="center">Black/White Illustration</td>
 		</tr>
 	</table>
 

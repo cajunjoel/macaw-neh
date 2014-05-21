@@ -29,8 +29,8 @@ YAHOO.macaw.NEH_filter = function(parent, data) {
 	// The "Type" specifier gives clues to render() and unrender() about
 	// how to handle different types of fields.
 	YAHOO.macaw.NEH_filter.metadataFields = [
-		{ id: 'neh_type_i', display_name: 'Illustration', type: 'checkbox'},
-		{ id: 'neh_type_d', display_name: 'Diagram', type: 'checkbox'},
+		{ id: 'neh_type_i', display_name: 'Painting/Drawing/Diagram', type: 'checkbox'},
+		{ id: 'neh_type_d', display_name: 'Chart/Table', type: 'checkbox'},
 		{ id: 'neh_type_m', display_name: 'Map', type: 'checkbox'},
 		{ id: 'neh_type_p', display_name: 'Photograph', type: 'checkbox'},
 		{ id: 'neh_type_l', display_name: 'Bookplate', type: 'checkbox'},

@@ -260,19 +260,6 @@ class NEH extends Controller {
 
 	}
 
-	function _translate_pagetype($t) {
-		if ($t == 'Title') {
-			return 'Title Page';
-		} else if ($t == 'Illustrations') {
-			return 'Illustration';
-		} else if ($t == 'Delete') {
-			return 'Suppress';
-		} else if ($t == 'Normal') {
-			return 'Text';
-		}
-		return $t;
-	}
-
 	// ----------------------------
 	// Function: _bucket_exists()
 	//

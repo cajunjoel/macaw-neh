@@ -505,7 +505,8 @@ class Book extends Model {
 			if ($type == 'filter') {
 				if (preg_match('/=/', $args[0])) {
 					$f = explode('=', array_shift($args));
-					if ($f[1] == 'Diagram-Chart') { $f[1] = 'Diagram/Chart'; }
+					if ($f[1] == 'Painting-Drawing-Diagram') { $f[1] = 'Painting/Drawing/Diagram'; }
+					if ($f[1] == 'Chart-Table') { $f[1] = 'Chart/Table'; }
 					if ($f[1] == 'Black-White') { $f[1] = 'Black/White'; }
 					$this->db->or_where('("fieldname" = \''.$f[0].'\' and "value" = \''.$f[1].'\')');
 				}				
@@ -1397,8 +1398,8 @@ class Book extends Model {
 		$q = $this->db->query(
 			"select 
 			   (select count(*) from metadata where fieldname = 'neh_type_p' and value = 'Photograph') as type_photos,
-			   (select count(*) from metadata where fieldname = 'neh_type_i' and value = 'Illustration') as type_illustration,
-			   (select count(*) from metadata where fieldname = 'neh_type_d' and value = 'Diagram/Chart') as type_diagram,
+			   (select count(*) from metadata where fieldname = 'neh_type_i' and value = 'Painting/Drawing/Diagram') as type_illustration,
+			   (select count(*) from metadata where fieldname = 'neh_type_d' and value = 'Chart/Table') as type_diagram,
 			   (select count(*) from metadata where fieldname = 'neh_type_l' and value = 'Bookplate') as type_bookplate,
 			   (select count(*) from metadata where fieldname = 'neh_type_m' and value = 'Map') as type_map,
 			   (select count(*) from item) as books,

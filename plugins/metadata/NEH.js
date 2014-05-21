@@ -352,8 +352,8 @@ YAHOO.macaw.NEH = function(parent, data) {
 		
 		obj.id = '';
 
-		if (key == 'i' || key == 'I') { obj.value = 'Illustration'; obj.name = 'neh_type_i'; }
-		if (key == 'd' || key == 'D') { obj.value = 'Diagram/Chart'; obj.name = 'neh_type_d'; }
+		if (key == 'i' || key == 'I') { obj.value = 'Painting/Drawing/Diagram'; obj.name = 'neh_type_i'; }
+		if (key == 'd' || key == 'D') { obj.value = 'Chart/Table'; obj.name = 'neh_type_d'; }
 		if (key == 'm' || key == 'M') { obj.value = 'Map'; obj.name = 'neh_type_m'; }
 		if (key == 'p' || key == 'P') { obj.value = 'Photograph'; obj.name = 'neh_type_p'; }
 		if (key == 'l' || key == 'L') { obj.value = 'Bookplate'; obj.name = 'neh_type_l'; }

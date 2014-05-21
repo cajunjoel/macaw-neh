@@ -11,8 +11,8 @@
 			<td valign="top" style="padding-left: 20px; padding-top: -10px; color: black">
 				<strong>Filters:</strong> <button onClick="return YAHOO.macaw.NEH_filter.resetFilter();" >Reset</button> <br>
 				Image Type:<br>
-				<input id="page_type_1" type="checkbox" name="neh_type_i" value="Illustration" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Illustration<br>
-				<input id="page_type_2" type="checkbox" name="neh_type_d" value="Diagram-Chart" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Diagram/Chart<br>
+				<input id="page_type_1" type="checkbox" name="neh_type_i" value="Painting-Drawing-Diagram" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Painting/Drawing/Diagram<br>
+				<input id="page_type_2" type="checkbox" name="neh_type_d" value="Chart-Table" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Chart/Table<br>
 				<input id="page_type_3" type="checkbox" name="neh_type_m" value="Map" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Map<br>
 				<input id="page_type_4" type="checkbox" name="neh_type_p" value="Photograph" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Photograph<br>
 				<input id="page_type_5" type="checkbox" name="neh_type_l" value="Bookplate" onChange="YAHOO.macaw.NEH_filter.filterPages();">&nbsp;Bookplate<br>
