@@ -72,7 +72,7 @@ class NEH extends Controller {
 		$date = date('Ymd-his');
 		$fh = fopen('/tmp/macaw_neh_export-'.$date.'.json', 'w');
 		fwrite($fh, '{"items":[');
-
+		$first = true;
 		// 1. Get all items from the database	
  		$books = $this->_get_books();
 		
@@ -155,6 +155,11 @@ class NEH extends Controller {
 			}
 			// 4. Convert the structure to JSON
 			// 5. Export the structure to the JSON Output file
+			if ($first) {
+				$first = false;
+			} else {
+				fwrite($fh, ',');
+			}
 			fwrite($fh, json_encode($bk));
 			print "Exported: ".$b->barcode."\n";
 			
