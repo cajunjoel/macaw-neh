@@ -68,9 +68,26 @@ class NEH extends Controller {
 	// ----------------------------
 	function export($args) {
 		// 0. Output the header info for the JSON Output file 
-		
+
+		$this->CI->logging->log('cron', 'info', 'NEH Export Starting.');
+
+		$basepath = $this->cfg['data_directory'].'/import_export';
+		if (!file_exists($basepath)) {
+			mkdir($basepath, 0775);
+		}
+
+		$fullpath = $basepath.'/ArtOfLife';
+		if (!file_exists($fullpath)) {
+			mkdir($fullpath, 0775);
+		}
+
+
 		$date = date('Ymd-his');
-		$fh = fopen('/tmp/macaw_neh_export-'.$date.'.json', 'w');
+		$filename = $fullpath.'/macaw_neh_export-'.$date.'.json';
+
+		$this->CI->logging->log('cron', 'info', 'Filename: '.$filename);
+
+		$fh = fopen($filename, 'w');
 		fwrite($fh, '{"items":[');
 		$first = true;
 		// 1. Get all items from the database	
@@ -161,7 +178,7 @@ class NEH extends Controller {
 				fwrite($fh, ',');
 			}
 			fwrite($fh, json_encode($bk));
-			print "Exported: ".$b->barcode."\n";
+			$this->CI->logging->log('cron', 'info', '  exported '.$b->barcode);
 			
 			// Mark the book as exported and complete
 			$this->CI->book->set_export_status('completed');
@@ -172,6 +189,7 @@ class NEH extends Controller {
 		// 6. Output the closing info for the JSON Output file
 		fwrite($fh, ']}');
 		fclose($fh);
+		$this->CI->logging->log('cron', 'info', 'NEH Export finished.');
 
 	}
 
