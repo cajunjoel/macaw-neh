@@ -5,11 +5,6 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<title>Dashboard | Macaw</title>
 	<? $this->load->view('global/head_view') ?>
-	<script type="text/javascript">
-		eval('var user_widgets = <? echo($user_widgets) ?>;');
-
-		YAHOO.util.Event.onDOMReady(YAHOO.macaw.Dashboard.init);
-	</script>
 </head>
 <body class="yui-skin-sam">
 	<? $this->load->view('global/header_view') ?>
@@ -17,8 +12,10 @@
 	<div id="dashboard">
 
 		<div id="Column1">
+			<? print $summary ?>
 		</div>
 		<div id="Column2">
+			<? print $topusers ?>
 		</div>
 		<div class="clear"><!-- --></div>
 	</div>

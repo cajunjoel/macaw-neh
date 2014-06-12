@@ -1402,10 +1402,15 @@ class Book extends Model {
 			   (select count(*) from metadata where fieldname = 'neh_type_d' and value = 'Chart/Table') as type_diagram,
 			   (select count(*) from metadata where fieldname = 'neh_type_l' and value = 'Bookplate') as type_bookplate,
 			   (select count(*) from metadata where fieldname = 'neh_type_m' and value = 'Map') as type_map,
+			   (select count(*) from metadata where fieldname = 'no_images'  and value = 'none') as no_images,
 			   (select count(*) from item) as books,
 			   (select count(*) from page) as pages,
+			   (select count(*) from item where status_code in ('new','scanning','scanned')) as new_items,
+			   (select count(*) from item where status_code in ('reviewing')) as in_progress,
 			   (select count(*) from item where status_code in ('reviewed','exporting')) as completed,
 			   (select count(*) from item where status_code in ('exported','completed')) as exported,
+			   (select count(*) from page where item_id in (select id from item where status_code in ('new','scanning','scanned'))) as new_items_pages,
+			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewing'))) as in_progress_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exporting'))) as completed_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('exported','completed'))) as exported_pages
 			   ;"
@@ -1417,15 +1422,45 @@ class Book extends Model {
 		$data->type_diagram = $r->type_diagram;
 		$data->type_bookplate = $r->type_bookplate;
 		$data->type_map = $r->type_map;
+		$data->no_images = $r->no_images;
 
+		$data->new_items = $r->new_items;
+		$data->in_progress = $r->in_progress;
 		$data->completed = $r->completed;
 		$data->exported = $r->exported;
 		$data->total_items = $r->books;
 		$data->total_pages = $r->pages;
 		$data->pct_complete = round($r->completed_pages / $r->pages * 100, 1);
+
+		$data->pages_new_items = $r->new_items_pages;
+		$data->pages_in_progress = $r->in_progress_pages;
 		$data->pages_complete = $r->completed_pages;
 		$data->pages_exported = $r->exported_pages;
 	
+		return $data;
+	}
+
+	function get_top_users_neh() {
+		$data = array();
+
+		$q = $this->db->query(
+			"select max(a.full_name) as full_name, a.username, count(i.id) as items, max(pg.page_count) as pages
+			from account a 
+			inner join item i on i.user_id = a.id 
+			inner join (select count(*) as page_count, a.id as user_id from page p inner join item i on p.item_id = i.id inner join account a on a.id = i.user_id group by a.id) pg on pg.user_id = a.id 
+			where i.status_code in ('reviewed','completed')
+			group by a.username 
+			order by items desc;"
+		);
+		foreach ($q->result() as $r) {
+			$data[] = array(	
+				'full_name' => $r->full_name,
+				'username' => $r->username,
+				'items' =>  $r->items,
+				'pages' =>  $r->pages,
+			
+			);
+		}
 		return $data;
 	}
 

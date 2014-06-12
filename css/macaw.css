@@ -568,39 +568,16 @@ td.yui-dt-last {
 	width: 64.7em;
 	margin: 1.55em auto;
 }
-#dashboard #controls {
-	text-align:center;
-	margin-bottom: .7em;
-}
-#summary, #total_scanned, #disk_usage, #pages_per_day {
-	padding: .5em;
-	width: 27em;
-	height: 15.5em;
-}
-#summary {
+
+#dashboard .widget {
+	border: 1px solid #4F7E97;
+	width: 24em;
 	text-align: left;
 	font-size: 115%;
+	line-height: 1.4;
 }
-.bd {
-	text-align: left;
-}
-#dashboard #summary-widget {
+#dashboard .widget .inner {
 	padding: 1em;
-}
-#dashboard .yui-panel {
-	border: 0;
-}
-#dashboard .yui-panel .bd {
-	background-color: #FFFFFF;
-	text-align: left;
-	border: 1px solid #4F7E97;
-	width: 28.1em;
-	padding-bottom: 1.5em;
-}
-#dashboard .yui-panel .hdr {
-	font-size: 120%;
-	padding-bottom: .3em;
-	color: #4F7E97;
 }
 #Column1, #Column2 {
 	position: relative;
@@ -608,16 +585,20 @@ td.yui-dt-last {
 	width: 32em;
 	min-height: 21em;
 }
-#dashboard .yui-panel {
-	width: 30.8em;
-	margin: .4em .4em 1.55em .4em;
-	background-color: #FFFFFF;
+#dashboard .widget h3 {
+	padding: .25em .75em .15em .75em;
+	margin: 0;
+	border-bottom:  1px solid #4F7E97;
+	color: #4F7E97;
 }
-.yui-panel .container-close {
-	text-indent: -10000em;
+#dashboard table {
+	width: 100%;
 }
-#summary-widget {
-	line-height: 1.5;
+#dashboard table th {
+	padding: .5em;
+}
+#dashboard table td.numeric {
+	text-align: right;
 }
 /* ****************************** */
 /* Main Page */

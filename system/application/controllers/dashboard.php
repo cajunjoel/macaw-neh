@@ -26,83 +26,10 @@ class Dashboard extends Controller {
 	 */
 	function index() {
 		$this->common->check_session();
-		$data['user_widgets'] = $this->_user_widgets();
+		$data['summary'] = $this->_get_summary();
+		$data['topusers'] = $this->_get_topusers();
 		$this->load->view('dashboard/dashboard_view', $data);
 	}
-
-	/**
-	 * Gets a user's dashboard widgets
-	 *
-	 * AJAX: Get the list of widgets from the current user's preferences. The
-	 * results of this is a two-element array of arrays of the items in the
-	 * lower array are the widgets in order for each column
-	 *
-	 * @access public
-	 * @return json The list of widgets and which columns they belong in
-	 *
-	 * @todo Make this pull from the current user's settings
-	 */
-	function _user_widgets() {
-		$this->user->load($this->session->userdata('username'));
-		return '{"widgets":'.$this->user->widgets.'}';
-	}
-
-	/**
-	 * Get one or more widgets
-	 *
-	 * AJAX: Given a name, return the info and data needed to build the widget
-	 * on the page.
-	 *
-	 * @access public
-	 * @param string [$name] The name(s) of the widget to get (comma-separated)
-	 * @return json The description and data of the named widget (echoed to browser)
-	 *
-	 */
-	function widget($name) {
-		if (!$this->common->check_session(true)) {
-			return;
-		}
-
-		$this->common->ajax_headers();
-		$names = split(',', $name);
-		$ret = array();
-
-		foreach ($names as $n) {
-			if ($n == 'summary') {
-				$ret[$n] = $this->_get_summary_widget();
-
-			} else if ($n == 'disk') {
-				$ret[$n] = $this->_get_disk_widget();
-
-			} else if ($n == 'pages') {
-				$ret[$n] = $this->_get_pages_widget();
-
-			} else if ($n == 'perday') {
-				$ret[$n] = $this->_get_perday_widget();
-			}
-		}
-		echo json_encode(array('widgets' => $ret));
-	}
-
-
-	/**
-	 * Save a user's widgets
-	 *
-	 * AJAX: Takes a list of widgets to save them to the user's preferences.
-	 * Returns nothing.
-	 *
-	 * @param json [$objects] An object describing the widgets for the current user.
-	 */
-	function save_widgets($widgets) {
-		$this->user->load($this->session->userdata('username'));
-		if ($widgets) {
-			$this->user->widgets = $widgets;
-		} else {
-			$this->user->widgets = $this->input->post('data');
-		}
-		$this->user->update();
-	}
-
 
 	/**
 	 * Get Summary widget data
@@ -114,211 +41,51 @@ class Dashboard extends Controller {
 	 * @return json The description and data of the named widget (echoed to browser)
 	 *
 	 */
-	function _get_summary_widget() {
-		// 	{ title: 'Summary',
-		// 	  html: '35 Books ready to be scanned<blockquote>10 at Library<br>25 at Pennsy<br></blockquote>12 Books scanned,
-		//           pending check-in<br><br>62 Books scanned total<br><br>3,585 Pages scanned total<br><br>Avg Time per Page / Book:   18 s / 2.5 h<br>',
-		// 	  column: 1
-		// 	}
-		$data = array();
-
+	function _get_summary() {
 		$row = $this->book->get_status_counts_neh();
 		
-		$data = array();
-		$data['title'] = 'Summary';
- 		$data['html'] = '<div id="summary-widget">'.
- 										'Image Types identified:<br>'.
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_illustration.' Paintings/Drawings/Diagrams<br>'.
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_photo.' Photographs<br>'.
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Chart/Table<br>'. 
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_map.' Maps<br>'.
-										'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_bookplate.' Bookplates<br>'.
- 										$row->total_items.' total items / '.$row->total_pages.' total pages<br>'.
- 										$row->completed.' completed items / '.$row->pages_complete.' completed pages<br>'.
- 										$row->exported.' exported items / '.$row->pages_exported.' exported pages<br>'.
- 										$row->pct_complete.'% complete overall'.
- 										'</div>';
-		$data['column'] = '1';
-		return $data;
-		
-		
-// 		$reviewing = $row->scanning + $row->scanned + $row->reviewing; // Things in progress
-// 
-// 		$data = array();
-// 		$data['title'] = 'Summary';
-// 		$data['html'] = '<div id="summary-widget">'.$row->new.' items ready to be scanned.<br>'.
-// 		               $reviewing.' items in progress.<br>'.
-// 		               $row->reviewed.' reviewed and ready to share.<br>'.
-// 		               $row->exporting.' being exported or verified.<br>'.
-// 		               $row->completed.' items completed.<br>'.
-// 		               $row->archived.' items archived.<br>'.
-// 		               $row->error.' items have errors.<br><br>'.
-// 		               $row->pages.' pages scanned total.<br>'.
-// 		               $row->avg.' average scanning time.</div>';
-// 		$data['column'] = '1';
-// 		return $data;
+ 		$html = '<div id="summary-widget" class="widget">'.
+						'<h3>Summary</h3>'.
+						'<div class="inner">'.
+						'Image Types identified:<br>'.
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_illustration.' Paintings/Drawings/Diagrams<br>'.
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_photo.' Photographs<br>'.
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_diagram.' Chart/Table<br>'. 
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_map.' Maps<br>'.
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->type_bookplate.' Bookplates<br>'.
+						'&nbsp;&nbsp;&nbsp;&nbsp;'.$row->no_images.' With No Images<br>'.
+						$row->total_items.' total items / '.$row->total_pages.' total pages<br>'.
+						$row->new_items.' new items / '.$row->pages_new_items.' new pages<br>'.
+						$row->in_progress.' in progress items / '.$row->pages_in_progress.' in progress pages<br>'.
+						$row->completed.' completed items / '.$row->pages_complete.' completed pages<br>'.
+						$row->exported.' exported items / '.$row->pages_exported.' exported pages<br>'.
+						$row->pct_complete.'% complete overall'.
+						'</div>'.
+						'</div>';
+		return $html;
 	}
 
 	/**
-	 * Get Disk Usage widget data
+	 * Get Summary widget data
 	 *
 	 * AJAX: Handed off from the widget() function, gathers and outputs the data
-	 * for the Disk Usage widget
+	 * for the Top pages by user widget
 	 *
 	 * @access internal
 	 * @return json The description and data of the named widget (echoed to browser)
 	 *
 	 */
-	function _get_disk_widget() {
-
-		$q = $this->db->query("select to_char(date,'fmmm/fmdd') as day, round(value / 1024 / 1024 / 1024) as megs from logging where statistic = 'disk-usage' and date >= now() - interval '10 days' order by date");
-		$rows = array();
-		foreach ($q->result() as $r) {
-			array_push($rows,$r);
+	function _get_topusers() {
+		$data = $this->book->get_top_users_neh();		
+ 		$html = '<div id="topusers-widget" class="widget">'.
+ 						'<h3>Completed Items by User</h3>'.
+						'<div class="inner"><table>';
+		$html .= '<thead><tr><th>Name</th><th>Items</th><th>Pages</th></tr></thead>';
+		foreach ($data as $r) {
+			$html .= '<tr><td>'.$r['full_name'].'</td><td class="numeric">'.$r['items'].'</td><td class="numeric">'.$r['pages'].'</td></tr>';
 		}
-
-		$data = array();
-		$data['title'] = 'Disk Usage (GB)';
-		$data['datasourcetype'] = 'YAHOO.util.DataSource.TYPE_JSARRAY';
-		$data['html'] = 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.';
-		$data['fields'] = array('day','megs');
-		$data['type'] = 'LineChart';
-		$data['xField'] = 'day';
-		$data['yField'] = 'megs';
-		$data['div_id'] = 'disk_usage';
-		$data['data'] = $rows;
-		$data['column'] = '2';
-		return $data;
-
-	// 	{ title: 'Disk Usage',
-	// 	  datasourcetype: YAHOO.util.DataSource.TYPE_JSARRAY,
-	// 	  fields: [ "day","megs" ],
-	// 	  type: 'LineChart',
-	// 	  xField: "day",
-	// 	  yField: "megs",
-	// 	  div_id: 'disk_usage',
-	// 	  column: 2,
-	// 	  data: [ { day: '6/7', megs: '6'},
-	// 			  { day: '6/8', megs: '16'},
-	// 			  { day: '6/9', megs: '28'},
-	// 			  { day: '6/10', megs: '32'},
-	// 			  { day: '6/11', megs: '47'},
-	// 			  { day: '6/12', megs: '51'},
-	// 			  { day: '6/13', megs: '51'},
-	// 			  { day: '6/14', megs: '75'},
-	// 			  { day: '6/15', megs: '89'},
-	// 			  { day: '6/16', megs: '93'}
-	// 			],
-	// 		html: 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.'
-	// 	}
-
-	}
-
-	/**
-	 * Get Total Pages Scanned widget data
-	 *
-	 * AJAX: Handed off from the widget() function, gathers and outputs the data
-	 * for the Total Pages Scanned widget
-	 *
-	 * @access internal
-	 * @return json The description and data of the named widget (echoed to browser)
-	 *
-	 */
-	function _get_pages_widget() {
-		$q = $this->db->query("select to_char(date,'fmmm/fmdd') as day, value as pages from logging where statistic = 'total-pages' and date >= now() - interval '10 days' order by date");
-		$rows = array();
-		foreach ($q->result() as $r) {
-			array_push($rows,$r);
-		}
-
-		$data = array();
-		$data['title'] = 'Total Pages Scanned';
-		$data['datasourcetype'] = 'YAHOO.util.DataSource.TYPE_JSARRAY';
-		$data['html'] = 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.';
-		$data['fields'] = array('day','pages');
-		$data['type'] = 'LineChart';
-		$data['xField'] = 'day';
-		$data['yField'] = 'pages';
-		$data['div_id'] = 'total_scanned';
-		$data['data'] = $rows;
-		$data['column'] = '1';
-		return $data;
-
-	// 	{ title: 'Total Pages Scanned',
-	// 	  datasourcetype: YAHOO.util.DataSource.TYPE_JSARRAY,
-	// 	  fields: [ "day","pages" ],
-	// 	  type: 'LineChart',
-	// 	  xField: "day",
-	// 	  yField: "pages",
-	// 	  div_id: 'total_scanned',
-	// 	  column: 1,
-	// 	  data: [ { day: '6/7', pages: '5'},
-	// 			  { day: '6/8', pages: '15'},
-	// 			  { day: '6/9', pages: '27'},
-	// 			  { day: '6/10', pages: '38'},
-	// 			  { day: '6/11', pages: '46'},
-	// 			  { day: '6/12', pages: '50'},
-	// 			  { day: '6/13', pages: '50'},
-	// 			  { day: '6/14', pages: '74'},
-	// 			  { day: '6/15', pages: '88'},
-	// 			  { day: '6/16', pages: '100'}
-	// 			],
-	// 		html: 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.'
-	// 	}
-
-	}
-
-	/**
-	 * Get Pages Per Day widget data
-	 *
-	 * AJAX: Handed off from the widget() function, gathers and outputs the data
-	 * for the Pages Per Day widget
-	 *
-	 * @access internal
-	 * @return json The description and data of the named widget (echoed to browser)
-	 *
-	 */
-	function _get_perday_widget() {
-		$q = $this->db->query("select to_char(date,'fmmm/fmdd') as day, value as pages from logging where statistic = 'pages' and date >= now() - interval '10 days' order by date");
-		$rows = array();
-		foreach ($q->result() as $r) {
-			array_push($rows,$r);
-		}
-
-		$data = array();
-		$data['title'] = 'Pages Per Day';
-		$data['datasourcetype'] = 'YAHOO.util.DataSource.TYPE_JSARRAY';
-		$data['html'] = 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.';
-		$data['fields'] = array('day','pages');
-		$data['type'] = 'ColumnChart';
-		$data['xField'] = 'day';
-		$data['yField'] = 'pages';
-		$data['div_id'] = 'pages_per_day';
-		$data['data'] = $rows;
-		$data['column'] = '2';
-		return $data;
-
-	// 	{ title: 'Pages Per Day',
-	// 	  datasourcetype: YAHOO.util.DataSource.TYPE_JSARRAY,
-	// 	  fields: [ "day","pages" ],
-	// 	  type: 'ColumnChart',
-	// 	  xField: "day",
-	// 	  yField: "pages",
-	// 	  div_id: 'pages_per_day',
-	// 	  column: 2,
-	// 	  data: [ { day: '6/7', pages: '23'},
-	// 			  { day: '6/8', pages: '23'},
-	// 			  { day: '6/9', pages: '27'},
-	// 			  { day: '6/10', pages: '24'},
-	// 			  { day: '6/11', pages: '29'},
-	// 			  { day: '6/12', pages: '1'},
-	// 			  { day: '6/13', pages: '1'},
-	// 			  { day: '6/14', pages: '35'},
-	// 			  { day: '6/15', pages: '28'},
-	// 			  { day: '6/16', pages: '24'}
-	// 			],
-	// 		html: 'Make sure you have Adboe Flash Version 9.0.4 or better installed. If you are seeing this, you need to <a href="http://get.adobe.com/flashplayer/">install or ugprade</a>.'
-	// 	}
-
+		$html .='</table></div>'.
+ 						'</div>';
+		return $html;
 	}
 }
