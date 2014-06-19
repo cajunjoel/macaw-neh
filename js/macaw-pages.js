@@ -403,6 +403,7 @@ YAHOO.macaw.Pages = function(parent, data, mdModules) {
 		}
 		for (var i in oBook.pages.pages) {
 			data.push( {
+				'sequence': this.pages[i].metadata.sequence,
 				'page_id': this.pages[i].pageID,
 				'metadata': this.pages[i].metadata.getSaveData(),
 				'deleted': this.pages[i].deleted

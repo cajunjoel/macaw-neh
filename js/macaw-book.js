@@ -143,10 +143,40 @@ YAHOO.macaw.Book = function() {
 		this.showSavingIndicator(finishing, finishing_later);
 
 		// Gather the data into an object so we can send it in via AJAX/JSON
+		saveData = this.pages.getSaveData();
+		
+		sequenceList = new Array();
+		// See if there are any pages without metadata
+		for (var d in saveData) {
+			allNull = true;
+			for (var m in saveData[d].metadata) {
+				if (saveData[d].metadata[m] != null && saveData[d].metadata[m] != '') {
+					allNull = false;
+					break;
+				}
+			}
+			if (allNull) { sequenceList.push(saveData[d].sequence); }
+		}
+		spliced = ' (+ '+(sequenceList.length-10)+' more)';
+		if (sequenceList.length > 10) {
+			list = new Array();
+			for (i=0; i<10; i++) {
+				list.push(sequenceList[i]);
+			}
+			sequenceList = list;
+		} else {
+			spliced = '';		
+		}
+		if (sequenceList.length > 0 && finishing) {
+			this.hideSavingIndicator(finishing, finishing_later);
+			General.showErrorMessage('The following pages do not have metadata. Please go back and review them: '+sequenceList.join(', ')+spliced);
+			return;			
+		}
+		
 		var objData = {
 			"item_id": this.itemID,
 			"inserted_missing": ((finishing_later || this.addingMissingPages) ? 1 : 0),
-			"pages": this.pages.getSaveData()
+			"pages": saveData
 		};
 
 		if (objData.pages.length == 0) {
