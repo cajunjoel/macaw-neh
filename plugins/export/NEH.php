@@ -71,12 +71,7 @@ class NEH extends Controller {
 
 		$this->CI->logging->log('cron', 'info', 'NEH Export Starting.');
 
-		$basepath = $this->cfg['data_directory'].'/import_export';
-		if (!file_exists($basepath)) {
-			mkdir($basepath, 0775);
-		}
-
-		$fullpath = $basepath.'/ArtOfLife';
+		$fullpath = '/home/shares/export';
 		if (!file_exists($fullpath)) {
 			mkdir($fullpath, 0775);
 		}
