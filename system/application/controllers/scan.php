@@ -615,7 +615,11 @@ class Scan extends Controller {
 
 		$this->common->ajax_headers();
 		// Get our book
-        $this->book->load($this->session->userdata('barcode'));
+		$this->book->load($this->session->userdata('barcode'));
+		if ($this->book->status == 'completed') {
+			echo json_encode(array('message' => 'This book is already completed. Changes will not be saved.'));
+			return;
+		}
 
 		// Embedded ampersands in the data cause trouble.
 		$data = preg_replace('/\&/i', '&amp;', $this->input->post('data'));

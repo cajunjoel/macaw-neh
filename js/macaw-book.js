@@ -120,7 +120,12 @@ YAHOO.macaw.Book = function() {
 					} else if (r.message) {
 						this.modified = 0;
 						if (finishing) {
-							this._doFinish();
+							if (r.message.match(/completed/)) {
+								General.showMessage(r.message);
+								this.hideSavingIndicator(finishing, finishing_later);
+							} else {
+								this._doFinish();							
+							}
 						} else if (finishing_later) {
 							//Changed direction to /scan/review. Finish later removed from review page. This only used with missing pages
 							window.location = sBaseUrl+'/scan/review/';
