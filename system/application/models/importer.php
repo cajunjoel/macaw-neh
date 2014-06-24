@@ -46,7 +46,7 @@ class Importer extends Model {
 		$args = $args[0];
 
 		// Did we get any arguments?
-		if (count($args) > 0) {
+		if (count($args) > 1) {
 			// Decide if the first argument is the name of an Import module, if it is, we call just that module
 			// with the remainder of the arguments.
 			if (in_array($args[0], $import_modules)) {
