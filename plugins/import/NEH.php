@@ -146,33 +146,48 @@ class NEH extends Controller {
 		// TODO: The first argument should be the name of a file containing information to import
 		$filename = '';
 		$fname = '';
-		if (count($args) <= 0) {
-			print "Import file not found!\nUsage: php index.php cron import NEH \"FILENAME\"\n";
-			$this->CI->common->save_import_status($fname, 0, 'Import file not found!', 1);
+		
+		$import_directory = $this->cfg['auto_import_directory'];
+		if (!file_exists($this->cfg['auto_import_directory'])) {
+			print "Import directory not found!\n";			
 			die;
+		}
+		// Get a list of the files in the directory
+		// Loop through them. If we haven't seen it, process it.
+		$files = scandir($this->cfg['auto_import_directory']);
+		foreach ($files as $f) {
+			if (preg_match('/^\./', $f)) {
+				continue;
+			}
+			if ($this->_imported_file($f)) {
+			 continue;
+			}
 			
-		} else {
-			$filename = '/'.implode($args, '/');
-			$fname = end($args);
-			$destination = $this->cfg['data_directory'].'/import_export/'.$fname;
+			print $f."\n";		
+
+			$filename = $this->cfg['auto_import_directory'].'/'.$f;
+			$destination = $this->cfg['data_directory'].'/import_export/'.$f;
 			copy($filename, $destination);
 			$this->import_filename = $destination;
-		}
 
-		$listener = new ArrayMaker();
-		$listener->set_callback(array($this, 'callback_load_item'));
-		
-		$stream = fopen($filename, 'r');
-		
-		try {
-			$parser = new JsonStreamingParser_Parser($stream, $listener);
-			$parser->parse();  
-		} catch (Exception $e) {
-			fclose($stream);
-			throw $e;
+			$listener = new ArrayMaker();
+			$listener->set_callback(array($this, 'callback_load_item'));
+			
+			$stream = fopen($filename, 'r');
+			
+			try {
+				$parser = new JsonStreamingParser_Parser($stream, $listener);
+				$parser->parse();  
+			} catch (Exception $e) {
+				fclose($stream);
+				throw $e;
+			}
+			
+			$this->CI->common->save_import_status($this->import_filename, $this->count, 'Finished! ('.$this->duplicate.' duplicates)', 1);
+			print 'Finished! ('.$this->duplicate.' duplicates)'."\n";
+			$this->CI->db->insert('custom_neh_import', array('filename' => $f));
 		}
 		
-		$this->CI->common->save_import_status($this->import_filename, $this->count, 'Finished! ('.$this->duplicate.' duplicates)', 1);
 		return array();
 	}
 	
@@ -185,6 +200,7 @@ class NEH extends Controller {
 				$this->_import_page($o, $p);
 			}
 			$this->CI->common->save_import_status($this->import_filename, $this->count, 'Item added with barcode '.$this->CI->book->barcode.' and id '.$this->CI->book->id);
+			print 'Item added with barcode '.$this->CI->book->barcode.' and id '.$this->CI->book->id."\n";
 		}		
 	}
 	
@@ -196,7 +212,7 @@ class NEH extends Controller {
 		$item['barcode'] = $json['barcode'];
 		if ($this->CI->book->exists($json['barcode'])) {
 			$this->CI->common->save_import_status($fname, 0, 'Identifier already exists: '.$json['barcode']);		
-			echo 'Identifier already exists: '.$json['barcode']."\n";
+			print 'Identifier already exists: '.$json['barcode']."\n";
 			$this->duplicate++;
 			return 0;
 
@@ -354,14 +370,25 @@ class NEH extends Controller {
 		}
 	}
 
+	function _imported_file($f) {
+		// Query the database for the barcode
+		$this->CI->db->where('filename', "$f");
+		$item = $this->CI->db->get('custom_neh_import');
+
+		// Did we get a record?
+		if ($item->num_rows() > 0) {
+			return true;
+		}	
+		return false;
+	}
+	
 	function _check_custom_table() {
-		if (!$this->CI->db->table_exists('custom_internet_archive')) {
+		if (!$this->CI->db->table_exists('custom_neh_import')) {
 			$this->CI->load->dbforge();
 			$this->CI->dbforge->add_field(array(
-				'item_id' =>    array( 'type' => 'int'),
-				'identifier' => array( 'type' => 'varchar', 'constraint' => '32' )
+				'filename' => array( 'type' => 'varchar', 'constraint' => '128' ),
 			));
-			$this->CI->dbforge->create_table('custom_internet_archive');
+			$this->CI->dbforge->create_table('custom_neh_import');
 		}
 	}
 }
