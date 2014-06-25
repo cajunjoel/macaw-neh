@@ -34,7 +34,7 @@ commit;
 				<a href="https://archive.org/details/<?php echo $ia_identifier; ?>" style="text-decoration: underline" target="_blank">View Original Item<br>at the Internet Archive</a>
 			</td>
 			<td valign="top">
-				<a href="#" onClick="General.openHelpNEH();return false;"><strong>Help?</strong></a>
+				<a href="/images/Macaw-Art-of-Life-Help.pdf" target="_blank"><strong>Help?</strong></a>
 			</td>
 		</tr>
 	</table>
