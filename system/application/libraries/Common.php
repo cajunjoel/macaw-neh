@@ -61,6 +61,7 @@ class Common extends Controller {
 				redirect($this->CI->config->item('base_url').'login');
 			}
 		}
+		$this->CI->common->session_log('last');
 		return true;
 	}
 
@@ -574,6 +575,39 @@ class Common extends Controller {
 				))
 			);
 		}
+	}
+	
+	function session_log($action) {
+		// drop table session_log cascade;
+		// create table session_log (user_id int, session_id varchar(40), login bigint, last_activity bigint);
+		// create view user_time as select user_id, sum(coalesce(last_activity, login, round(extract(epoch from now()))) - coalesce(login, round(extract(epoch from now())))) as total_secs from session_log group by user_id;
+
+		// Do we have a record for this user/session?
+		$this->CI->db->where('user_id', $this->CI->session->userdata('id'));
+		$this->CI->db->where('session_id', $this->CI->session->userdata('session_id'));
+		$ret = $this->CI->db->get('session_log');
+
+		// No? Create a record
+		if ($ret->num_rows() == 0) {
+			$data = array(
+				'user_id' => $this->CI->session->userdata('id'),
+				'session_id' => $this->CI->session->userdata('session_id')
+			);
+			$this->CI->db->insert('session_log', $data);
+		}
+		
+		// Save the logout event to the database.
+		$this->CI->db->where('user_id', $this->CI->session->userdata('id'));
+		$this->CI->db->where('session_id', $this->CI->session->userdata('session_id'));
+
+		if ($action == 'login') {
+			$this->CI->db->update('session_log', array('login' => time()));			
+			$this->CI->db->query('vacuum session_log');
+			
+		} else if ($action == 'last') {
+			$this->CI->db->update('session_log', array('last_activity' => time()));
+
+		} 
 	}
 
 }

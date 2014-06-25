@@ -62,6 +62,7 @@ class Login extends Controller {
 			$this->logging->log('access', 'info', 'User logged in.');
 			// Clear out any old sessions. This should be speedy.
 			$this->authentication->clear_sessions();
+			$this->common->session_log('login');
 			
 			redirect($this->config->item('base_url').'dashboard');
 		} else {
