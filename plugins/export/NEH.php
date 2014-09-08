@@ -71,9 +71,10 @@ class NEH extends Controller {
 
 		$this->CI->logging->log('cron', 'info', 'NEH Export Starting.');
 
-		$fullpath = '/home/shares/export';
+		$fullpath = $this->cfg['auto_export_directory'];
 		if (!file_exists($fullpath)) {
-			mkdir($fullpath, 0775);
+			$this->CI->logging->log('cron', 'error', 'COULD NOT FIND EXPORT DIRECTORY: '.$fullpath);
+			return;
 		}
 
 

@@ -39,7 +39,7 @@ class Book extends Model {
 	 */
 	public $id = '';
 	public $org_id = '';
-	public $user_id = '';
+	public $user_id = 0;
 	public $barcode = '';
 	public $status  = '';
 	public $pages_found = '';
@@ -1113,7 +1113,7 @@ class Book extends Model {
 
 		// Make it so admin doesn't "take" ownership from someone else
 		$this->CI->user->load(null, $this->session->userdata('id'));
-		if (!$this->CI->user->has_permission('admin') || !isset($this->user_id)) {
+		if (!$this->CI->user->has_permission('admin') || !isset($this->user_id) || $this->user_id == 0) {
 			$data['user_id'] = $this->session->userdata('id');
 		}
 

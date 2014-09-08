@@ -149,8 +149,8 @@ class NEH extends Controller {
 		
 		$import_directory = $this->cfg['auto_import_directory'];
 		if (!file_exists($this->cfg['auto_import_directory'])) {
-			print "Import directory not found!\n";			
-			die;
+			$this->CI->logging->log('cron', 'error', 'COULD NOT FIND IMPORT DIRECTORY: '.$fullpath);
+			return;
 		}
 		// Get a list of the files in the directory
 		// Loop through them. If we haven't seen it, process it.
@@ -271,6 +271,7 @@ class NEH extends Controller {
 		$this->CI->book->set_page_metadata($page_id, 'contrast_hasillustration', $page['contrast_hasillustration']);
 		$this->CI->book->set_page_metadata($page_id, 'percent_coverage', $page['percent_coverage']);
 		$this->CI->book->set_page_metadata($page_id, 'illustrations', serialize($page['illustrations']));
+		$this->CI->book->set_page_metadata($page_id, 'neh_color', 'Black/White');
 
 		$this->CI->db->trans_complete();
 

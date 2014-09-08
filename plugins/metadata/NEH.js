@@ -427,6 +427,30 @@ YAHOO.macaw.NEH.metadataChange = function(obj) {
 					if (obj.checked) {
 						pg[i].metadata.callFunction('set', fields[f].id, obj.value, multiple);
 						save_val = obj.value;
+						// If we checked the "No images" checkbox, clear the image type and color depth
+						if (fields[f].id == 'no_images') {
+							Dom.get('neh_type_i').checked = false;
+							Dom.get('neh_type_d').checked = false;
+							Dom.get('neh_type_m').checked = false;
+							Dom.get('neh_type_p').checked = false;
+							Dom.get('neh_type_l').checked = false;
+							document.getElementsByName('neh_color')[0].checked = false;
+							document.getElementsByName('neh_color')[1].checked = false;
+							
+							pg[i].metadata.modules[0].set('neh_color', null, multiple);
+							pg[i].metadata.modules[0].set('neh_type_i', null, multiple);
+							pg[i].metadata.modules[0].set('neh_type_d', null, multiple);
+							pg[i].metadata.modules[0].set('neh_type_m', null, multiple);
+							pg[i].metadata.modules[0].set('neh_type_p', null, multiple);
+							pg[i].metadata.modules[0].set('neh_type_l', null, multiple);
+						}
+
+						if (fields[f].id == 'neh_type_i' || fields[f].id == 'neh_type_d' || fields[f].id == 'neh_type_m' ||
+						    fields[f].id == 'neh_type_p' || fields[f].id == 'neh_type_l' || fields[f].id == 'neh_color') {
+							Dom.get('no_images').checked = false;
+							pg[i].metadata.modules[0].set('no_images', null, multiple);
+						}
+
 					} else {
 						pg[i].metadata.callFunction('set', fields[f].id, null, multiple);
 					}

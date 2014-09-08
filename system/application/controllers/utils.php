@@ -78,13 +78,14 @@ class Utils extends Controller {
 	 * @since Version 1.1
 	 */
 	function log() {
-		$data = json_decode($this->input->post('data'));
-
-		$this->logging->log(
-			'activity',
-			'info',
-			'Item='.$this->session->userdata('barcode').', Page='.$data->pageid.', Field='.$data->field.', Value='.$data->value
-		);
+		// For NEH, we skip the activity log for performance reasons.
+//		$data = json_decode($this->input->post('data'));
+//
+//		$this->logging->log(
+//			'activity',
+//			'info',
+//			'Item='.$this->session->userdata('barcode').', Page='.$data->pageid.', Field='.$data->field.', Value='.$data->value
+//		);
 		echo "Ok";
 	}
 
