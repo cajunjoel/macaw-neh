@@ -155,9 +155,11 @@ YAHOO.macaw.Book = function() {
 		for (var d in saveData) {
 			allNull = true;
 			for (var m in saveData[d].metadata) {
-				if (saveData[d].metadata[m] != null && saveData[d].metadata[m] != '') {
-					allNull = false;
-					break;
+				if (m != 'neh_color') {
+					if (saveData[d].metadata[m] != null && saveData[d].metadata[m] != '') {
+						allNull = false;
+						break;
+					}
 				}
 			}
 			if (allNull) { sequenceList.push(saveData[d].sequence); }
