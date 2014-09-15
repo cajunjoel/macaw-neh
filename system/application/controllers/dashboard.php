@@ -58,7 +58,8 @@ class Dashboard extends Controller {
 						$row->new_items.' new items / '.$row->pages_new_items.' new pages<br>'.
 						$row->in_progress.' in progress items / '.$row->pages_in_progress.' in progress pages<br>'.
 						$row->completed.' completed items / '.$row->pages_complete.' completed pages<br>'.
-						'<strong>'.$row->exported.' exported items / '.$row->pages_exported.' exported pages<br></strong>'.
+						$row->exported.' exported items / '.$row->pages_exported.' exported pages<br>'.
+						'<strong>'.($row->exported+$row->completed).' completed &amp; exported items<br>'.($row->pages_exported+$row->pages_complete).' completed &amp; exported pages<br></strong>'.
 						'</div>'.
 						'</div>';
 		return $html;
