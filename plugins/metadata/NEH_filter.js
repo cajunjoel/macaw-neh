@@ -24,6 +24,7 @@ YAHOO.macaw.NEH_filter = function(parent, data) {
 	this.pageID = this.parent.parent.pageID;
 	this.nofilter = false;
 	this.sizeSlider = null;
+	this.trx = null;
 	
 	// These correspond exactly to the id attributes in the php file
 	// The "Type" specifier gives clues to render() and unrender() about
@@ -428,10 +429,13 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 		values += '/page/'+oBook.currentDisplayPage;
 	}
 	// Call the URL to get the data
-	// alert(sBaseUrl+'/scan/get_all_thumbnails'+values);
 	oBook.showSpinner(true);
-//	alert(sBaseUrl+'/scan/get_all_thumbnails'+values);
-	var transaction = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
+
+	if (YAHOO.util.Connect.isCallInProgress(YAHOO.macaw.NEH_filter.trx)) {
+		YAHOO.util.Connect.abort(YAHOO.macaw.NEH_filter.trx);
+	}
+
+	YAHOO.macaw.NEH_filter.trx = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
 }
 
 YAHOO.macaw.NEH_filter.resetFilter = function() {

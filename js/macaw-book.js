@@ -849,12 +849,13 @@ YAHOO.macaw.Book = function() {
 			};
 			
 			var target = document.getElementById('thumbs');
-			this.spinner = new Spinner(opts);
+			if (!this.spinner) {
+				this.spinner = new Spinner(opts);
+			}
 			this.spinner.spin(target);
 		
 		} else {
-			this.spinner.stop();
-		
+			this.spinner.stop();		
 		}
 	}
 	
