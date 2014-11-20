@@ -25,6 +25,7 @@ YAHOO.macaw.NEH_filter = function(parent, data) {
 	this.nofilter = false;
 	this.sizeSlider = null;
 	this.trx = null;
+	this.pageChanged = false;
 	
 	// These correspond exactly to the id attributes in the php file
 	// The "Type" specifier gives clues to render() and unrender() about
@@ -340,6 +341,7 @@ YAHOO.macaw.NEH_filter.pageChange = function(inc) {
 		oBook.currentDisplayPage = 1;
 	}
 	Dom.get('current-page').innerHTML = "Current Page "+oBook.currentDisplayPage;
+	YAHOO.macaw.NEH_filter.pageChanged = true;
 	YAHOO.macaw.NEH_filter.filterPages();
 }
 
@@ -437,20 +439,28 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 	values += '/sort/'+Dom.get('sort').value;
 	values += '/user/'+Dom.get('user').value;
 	values += '/perpage/'+Dom.get('perpage').value;
-	
+
+	if (YAHOO.macaw.NEH_filter.pageChanged == false) {
+		oBook.currentDisplayPage = 1;
+		Dom.get('current-page').innerHTML = "Current Page "+oBook.currentDisplayPage;
+	}
 	if (oBook.currentDisplayPage) {
 		values += '/page/'+oBook.currentDisplayPage;
+		gotCriteria = 1;
 	}
+	YAHOO.macaw.NEH_filter.pageChanged = false;
 	// Call the URL to get the data
 
 	if (gotCriteria == 1) {
 		oBook.showSpinner(true);
+
 	
 		if (YAHOO.util.Connect.isCallInProgress(YAHOO.macaw.NEH_filter.trx)) {
 			YAHOO.util.Connect.abort(YAHOO.macaw.NEH_filter.trx);
 		}
 
 		YAHOO.macaw.NEH_filter.trx = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
+
 	}
 }
 
