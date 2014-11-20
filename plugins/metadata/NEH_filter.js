@@ -363,6 +363,8 @@ YAHOO.macaw.NEH_filter.metadataChange = function(obj) {
 }
 
 YAHOO.macaw.NEH_filter.filterPages = function() {
+	gotCriteria = 0;
+	
 	var loadDataCallback = {
 		success: function (o){
 			oBook.showSpinner(false);
@@ -395,30 +397,41 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 	}
 	values = '';
 	if (Dom.get('page_type_1').checked) {
-		values += '/filter/neh_type_i='+Dom.get('page_type_1').value
+		values += '/filter/neh_type_i='+Dom.get('page_type_1').value;
+		gotCriteria = 1;
 	}
 	if (Dom.get('page_type_2').checked) {
-		values += '/filter/neh_type_d='+Dom.get('page_type_2').value
+		values += '/filter/neh_type_d='+Dom.get('page_type_2').value;
+		gotCriteria = 1;
 	}
 	if (Dom.get('page_type_3').checked) {
-		values += '/filter/neh_type_m='+Dom.get('page_type_3').value
+		values += '/filter/neh_type_m='+Dom.get('page_type_3').value;
+		gotCriteria = 1;
 	}
 	if (Dom.get('page_type_4').checked) {
-		values += '/filter/neh_type_p='+Dom.get('page_type_4').value
+		values += '/filter/neh_type_p='+Dom.get('page_type_4').value;
+		gotCriteria = 1;
 	}
 	if (Dom.get('page_type_5').checked) {
-		values += '/filter/neh_type_l='+Dom.get('page_type_5').value
+		values += '/filter/neh_type_l='+Dom.get('page_type_5').value;
+		gotCriteria = 1;
 	}
 
 	if (Dom.get('neh_color_c').checked) {
-		values += '/filter/neh_color='+Dom.get('neh_color_c').value
+		values += '/filter/neh_color='+Dom.get('neh_color_c').value;
+		gotCriteria = 1;
 	}
 	if (Dom.get('neh_color_bw').checked) {
-		values += '/filter/neh_color='+Dom.get('neh_color_bw').value
+		values += '/filter/neh_color='+Dom.get('neh_color_bw').value;
+		gotCriteria = 1;
 	}
 
 	if (Dom.get('no_images').checked) {
-		values += '/filter/no_images=none'
+		values += '/filter/no_images=none';
+		gotCriteria = 1;
+	}
+	if (Dom.get('user').value != -1) {
+		gotCriteria = 1;
 	}
 
 	values += '/sort/'+Dom.get('sort').value;
@@ -429,13 +442,16 @@ YAHOO.macaw.NEH_filter.filterPages = function() {
 		values += '/page/'+oBook.currentDisplayPage;
 	}
 	// Call the URL to get the data
-	oBook.showSpinner(true);
 
-	if (YAHOO.util.Connect.isCallInProgress(YAHOO.macaw.NEH_filter.trx)) {
-		YAHOO.util.Connect.abort(YAHOO.macaw.NEH_filter.trx);
+	if (gotCriteria == 1) {
+		oBook.showSpinner(true);
+	
+		if (YAHOO.util.Connect.isCallInProgress(YAHOO.macaw.NEH_filter.trx)) {
+			YAHOO.util.Connect.abort(YAHOO.macaw.NEH_filter.trx);
+		}
+
+		YAHOO.macaw.NEH_filter.trx = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
 	}
-
-	YAHOO.macaw.NEH_filter.trx = YAHOO.util.Connect.asyncRequest('GET', sBaseUrl+'/scan/get_all_thumbnails'+values, loadDataCallback, null);
 }
 
 YAHOO.macaw.NEH_filter.resetFilter = function() {

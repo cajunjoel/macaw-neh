@@ -60,6 +60,7 @@ class Dashboard extends Controller {
 						$row->completed.' completed items / '.$row->pages_complete.' completed pages<br>'.
 						$row->exported.' exported items / '.$row->pages_exported.' exported pages<br>'.
 						'<strong>'.($row->exported+$row->completed).' completed &amp; exported items<br>'.($row->pages_exported+$row->pages_complete).' completed &amp; exported pages<br></strong>'.
+						'<strong>Avg time per item: '.$row->average_time.'</strong>'.
 						'</div>'.
 						'</div>';
 		return $html;

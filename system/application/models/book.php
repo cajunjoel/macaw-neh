@@ -185,13 +185,13 @@ class Book extends Model {
 					'status_code' => $status,
 				);
 
-				if ($status == 'scanning'  && !$q[0]->date_scanning_start) { $data['date_scanning_start'] = 'now()'; }
-				if ($status == 'scanned'   && !$q[0]->date_scanning_end)   { $data['date_scanning_end']   = 'now()'; }
-				if ($status == 'reviewing' && !$q[0]->date_review_start)   { $data['date_review_start']   = 'now()'; }
-				if ($status == 'reviewed'  && !$q[0]->date_review_end)     { $data['date_review_end']     = 'now()'; }
-				if ($status == 'completed' && !$q[0]->date_completed)      { $data['date_completed']      = 'now()'; }
-				if ($status == 'exporting' && !$q[0]->date_export_start)   { $data['date_export_start']   = 'now()'; }
-				if ($status == 'archived'  && !$q[0]->date_archived)       { $data['date_archived']       = 'now()'; }
+				if ($status == 'scanning'  && !$q[0]->date_scanning_start) { $data['date_scanning_start'] = date('Y-m-d H:i:s'); }
+				if ($status == 'scanned'   && !$q[0]->date_scanning_end)   { $data['date_scanning_end']   = date('Y-m-d H:i:s'); }
+				if ($status == 'reviewing' && !$q[0]->date_review_start)   { $data['date_review_start']   = date('Y-m-d H:i:s'); }
+				if ($status == 'reviewed'  && !$q[0]->date_review_end)     { $data['date_review_end']     = date('Y-m-d H:i:s'); }
+				if ($status == 'completed' && !$q[0]->date_completed)      { $data['date_completed']      = date('Y-m-d H:i:s'); }
+				if ($status == 'exporting' && !$q[0]->date_export_start)   { $data['date_export_start']   = date('Y-m-d H:i:s'); }
+				if ($status == 'archived'  && !$q[0]->date_archived)       { $data['date_archived']       = date('Y-m-d H:i:s'); }
 
 				$this->db->set($data);
 				$this->db->update('item');
@@ -475,13 +475,12 @@ class Book extends Model {
 			$args = $args[0];
 		}
 		
-		$this->db->join('metadata', 'metadata.page_id = page.id', 'left');
-		$this->db->distinct();
-		$this->db->select('page.id');
-//		$this->db->or_where('1','1');
+		$q_fields = array('page.id');
+		$q_join = array('page');
+		$q_orderby = '';
+		$q_limit = '';
 		
-//		print "<pre>";
-
+		$fc = 1;
 		while (count($args)) {
 			$type = array_shift($args);
 			if ($type == 'sort') {
@@ -489,8 +488,8 @@ class Book extends Model {
 					$f = array_shift($args);
 					$orderby = $f;	
 					$f = explode('=', $f);
-					$this->db->order_by($f[0], $f[1]);
-					$this->db->select($f[0]);
+					$q_orderby = 'ORDER BY '. $this->db->escape_str($f[0]).' '.$this->db->escape_str($f[1]);
+					$q_fields[] = $this->db->escape_str($f[0]);
 				}
 			}
 			if ($type == 'user') {
@@ -498,7 +497,7 @@ class Book extends Model {
 					array_shift($args);
 				} else {
 					if (preg_match('/[0-9]/', $args[0])) {
-						$this->db->where('metadata.user_id', array_shift($args));
+						$q_join[] = '(select * from metadata where user_id = '.$this->db->escape_str($args[0]).') mu on mu.page_id = page.id';
 					}
 				}
 			}
@@ -508,16 +507,17 @@ class Book extends Model {
 					if ($f[1] == 'Painting-Drawing-Diagram') { $f[1] = 'Painting/Drawing/Diagram'; }
 					if ($f[1] == 'Chart-Table') { $f[1] = 'Chart/Table'; }
 					if ($f[1] == 'Black-White') { $f[1] = 'Black/White'; }
-					$this->db->or_where('("fieldname" = \''.$f[0].'\' and "value" = \''.$f[1].'\')');
+					$q_join[] = '(select * from metadata where fieldname = \''.$this->db->escape_str($f[0]).'\' and value = \''.$this->db->escape_str($f[1]).'\') m'.$fc.' on m'.$fc.'.page_id = page.id';
+					$fc++;
 				}				
 			}
 			if ($type == 'page') {
-				if (preg_match('/[0-9]/', $args[0])) {
+				if (preg_match('/^[0-9]$/', $args[0])) {
 					$page = array_shift($args);
 				}
 			}
 			if ($type == 'perpage') {
-				if (preg_match('/[0-9]/', $args[0])) {
+				if (preg_match('/^[0-9]$/', $args[0])) {
 					$perpage = array_shift($args);
 				}
 			}
@@ -525,14 +525,14 @@ class Book extends Model {
 		
 		// Get the pages
 		if (!$orderby) {
-			$this->db->order_by('sequence_number', 'asc');
-			$this->db->select('sequence_number');
+			$q_orderby = 'ORDER BY sequence_number asc';
+			$q_fields[] = 'sequence_number';
 		}
 		if ($page) {
-			$this->db->limit($perpage, ($perpage * ($page-1)));
+			$q_limit = "LIMIT ".$perpage." OFFSET ".($perpage * ($page-1));
 		}
 
-		$query = $this->db->get('page');
+		$query = $this->db->query('SELECT DISTINCT '.implode(', ', $q_fields).' FROM '.implode(' INNER JOIN ', $q_join).' '.$q_orderby.' '.$q_limit);
 		$pages = $query->result();
 //		print $this->db->last_query()."\n\n";
 
@@ -1412,7 +1412,8 @@ class Book extends Model {
 			   (select count(*) from page where item_id in (select id from item where status_code in ('new','scanning','scanned'))) as new_items_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewing'))) as in_progress_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exporting'))) as completed_pages,
-			   (select count(*) from page where item_id in (select id from item where status_code in ('exported','completed'))) as exported_pages
+			   (select count(*) from page where item_id in (select id from item where status_code in ('exported','completed'))) as exported_pages,
+			   (select date_part('hour', t) || 'h ' || date_part('min', t) || 'm ' || round(date_part('second', t)) || 's ' from (select sum(date_review_end - date_review_start) / count(*) as t from item where date_review_start is not null and date_review_end is not null) as a) as average_time
 			   ;"
 		);
 		$r = $q->row();
@@ -1436,6 +1437,8 @@ class Book extends Model {
 		$data->pages_in_progress = $r->in_progress_pages;
 		$data->pages_complete = $r->completed_pages;
 		$data->pages_exported = $r->exported_pages;
+
+		$data->average_time = $r->average_time;
 	
 		return $data;
 	}
