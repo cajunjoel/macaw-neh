@@ -1413,7 +1413,7 @@ class Book extends Model {
 			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewing'))) as in_progress_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('reviewed','exporting'))) as completed_pages,
 			   (select count(*) from page where item_id in (select id from item where status_code in ('exported','completed'))) as exported_pages,
-			   (select date_part('hour', t) || 'h ' || date_part('min', t) || 'm ' || round(date_part('second', t)) || 's ' from (select sum(date_review_end - date_review_start) / count(*) as t from item where date_review_start is not null and date_review_end is not null) as a) as average_time
+			   (select date_part('hour', t) || 'h ' || date_part('min', t) || 'm ' || round(date_part('second', t)) || 's ' from (select sum(date_review_end - date_review_start) / count(*) as t from item where date_review_start is not null and date_review_end is not null and (date_review_end - date_review_start) < interval '1 day' and (date_review_end - date_review_start) > interval '20 seconds') as a) as average_time
 			   ;"
 		);
 		$r = $q->row();
